@@ -37,6 +37,15 @@ Người chơi là vị thần bảo hộ một ngôi làng. Màn hình dọc ch
 
 ---
 
+## 2b. Phong cách hình ảnh (anh chốt 18:14)
+
+**Hoạt hình / cách điệu (cartoon, stylized).** Không vẽ tả thực.
+- Pháp sư thần thoại vẽ theo kiểu hoạt hình. Hình khối to, đường viền rõ, đọc được ngay ở cỡ nhỏ (bệ pháp sư trên cổng chỉ khoảng 40 pt).
+- Bốn màu nguyên tố (đỏ Lửa, xanh lá Khí, xanh dương Nước, vàng Đất) phải đậm và tách biệt rõ, kể cả với người mù màu. Mỗi ô có thêm biểu tượng riêng, không chỉ dựa vào màu.
+- Phép và hiệu ứng nổ, cột sáng, chữ CRIT: phóng đại, nhiều màu, đúng chất "dopamine".
+- Quái: dễ thương pha chút đáng sợ, không máu me (hợp cả Mỹ và Nhật, độ tuổi rộng).
+- Artist đề xuất 2–3 hướng cụ thể trong khuôn khổ trên (ví dụ chibi tỉ lệ đầu to, hay cách điệu kiểu tranh phẳng). Anh chọn hướng cuối cùng.
+
 ## 3. Luật chi tiết
 
 ### 3.1 Vòng lặp một ngày
@@ -359,4 +368,4 @@ Máy chủ: thời gian ngoại tuyến, quay thẻ, IAP, giới hạn video, l�
 3. Thưởng khi mở hết một nhóm trang sách phép là gì?
 4. Thời đại, kỳ quan, phép thần (Lòng tin) có vào bản phát hành đầu không?
 5. Engine (Unity hay Godot) và cách làm máy chủ: CTO đề xuất.
-6. Phong cách hình ảnh: anh chốt sau khi Artist đưa 2–3 hướng.
+6. Phong cách hình ảnh đã chốt là hoạt hình / cách điệu (mục 2b); hướng cụ thể anh chọn sau khi Artist đưa 2–3 phương án.
