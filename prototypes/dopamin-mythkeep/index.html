@@ -1,0 +1,545 @@
+<title>Mythkeep</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Philosopher:wght@700&family=Nunito:wght@600;800&display=swap">
+<style>
+/* Layout: one phone-shaped column — scene (village by day, meadow by night) on top, HUD strip, 7×6 board below. Single dark look by choice. */
+:root{
+  --ink:#f3ecdc; --muted:#a99f8c; --bg:#15121c; --panel:#221d2b; --line:#3a3245;
+  --fire:#e4572e; --air:#3fb37f; --water:#2f80ed; --earth:#e8b730;
+  --display:"Philosopher", Georgia, serif; --body:"Nunito", system-ui, sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);overflow:hidden;
+  padding-left:max(12px, env(safe-area-inset-left, 0px));padding-right:max(12px, env(safe-area-inset-right, 0px));box-sizing:border-box}
+#app{height:100%;max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:6px;padding-block:8px;box-sizing:border-box}
+#sceneWrap{position:relative;flex:1 1 auto;min-height:0;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+#scene{width:100%;height:100%;display:block;cursor:pointer}
+#dayBtns{position:absolute;left:8px;right:8px;bottom:8px;display:flex;gap:4px;justify-content:space-between}
+#dayBtns button{padding-inline:8px;font-size:12px;white-space:nowrap}
+button{font:800 13px var(--body);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 10px;cursor:pointer}
+button:disabled{opacity:.45;cursor:default}
+button:focus-visible{outline:2px solid var(--earth);outline-offset:2px}
+button:active{transform:translateY(1px)}
+#banner{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);font:700 19px var(--display);text-align:center;
+  text-shadow:0 2px 10px #000;pointer-events:none;opacity:0;transition:opacity .25s;max-width:92%}
+#banner.show{opacity:1}
+#hud{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;justify-content:space-between;font-size:14px;font-variant-numeric:tabular-nums}
+.res{display:flex;gap:9px}
+.res span{display:inline-flex;gap:2px;align-items:center;font-weight:800}
+.res span.bump{animation:bump .3s}
+@keyframes bump{50%{transform:scale(1.3)}}
+#phase{font:700 13px var(--display);padding:3px 8px;border-radius:999px;background:var(--panel);border:1px solid var(--line)}
+#btnBook{padding:3px 8px}
+#gateBar{flex:1 1 100%;height:8px;background:var(--panel);border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+#gateFill{height:100%;background:linear-gradient(90deg,#c0392b,#e8b730);transition:width .2s}
+#boardWrap{flex:0 0 auto;display:grid;place-items:center}
+body.night .res{display:none}
+#board{position:relative;touch-action:none;border-radius:12px;background:#1c1724;outline:1px solid var(--line)}
+.tile{position:absolute;left:0;top:0;display:grid;place-items:center;transition:transform .18s ease-in;will-change:transform}
+.face{width:88%;height:88%;border-radius:24%;display:grid;place-items:center;font-size:calc(var(--cell)*.5);line-height:1;
+  transition:transform .16s, opacity .16s;position:relative;box-shadow:inset 0 -4px 0 #0004}
+.tile[data-c="0"] .face{background:radial-gradient(circle at 35% 30%,#ff8a63,var(--fire))}
+.tile[data-c="1"] .face{background:radial-gradient(circle at 35% 30%,#7be0a9,var(--air))}
+.tile[data-c="2"] .face{background:radial-gradient(circle at 35% 30%,#7fb4ff,var(--water))}
+.tile[data-c="3"] .face{background:radial-gradient(circle at 35% 30%,#ffe08a,var(--earth))}
+.tile[data-sp="orb"] .face,.tile[data-sp="cross"] .face{box-shadow:inset 0 0 0 3px #fff,0 0 14px #fffa}
+.tile .badge{position:absolute;right:4%;bottom:2%;font-size:calc(var(--cell)*.26);color:#fff;text-shadow:0 1px 2px #000}
+.tile .val{position:absolute;left:6%;top:2%;font:800 calc(var(--cell)*.22) var(--body);color:#fff;text-shadow:0 1px 2px #000}
+.tile[data-sp="rainbow"] .face{background:conic-gradient(var(--fire),var(--earth),var(--air),var(--water),var(--fire));box-shadow:inset 0 0 0 4px var(--rc,#fff),0 0 14px #fff8}
+.tile[data-sp="gem"] .face{background:radial-gradient(circle at 40% 30%,#3d3550,#16121d);box-shadow:inset 0 0 0 2px #9fd8ff,0 0 12px #9fd8ff88}
+.tile.pop .face{transform:scale(.2);opacity:0}
+#board.flip .face{transform:rotateY(90deg)}
+.overlay{position:fixed;inset:0;background:#000b;display:grid;place-items:center;z-index:5;padding:16px}
+/* Màn hình trong công trình: toàn màn hình, thời gian ban ngày tạm dừng */
+.overlay.full{padding:0;background:var(--bg)}
+.overlay.full .card{width:100%;height:100%;max-height:none;max-width:460px;border-radius:0;border:0;align-content:start;padding:calc(18px + env(safe-area-inset-top,0px)) 18px 18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;width:min(380px,100%);max-height:86vh;overflow:auto;display:grid;gap:10px;box-sizing:border-box}
+.card h2{font:700 22px var(--display);margin:0;text-align:center;text-wrap:balance}
+.card h3{font:700 16px var(--display);margin:6px 0 0}
+.card p{margin:0;color:var(--muted);line-height:1.45;font-size:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.wz{border:1px solid var(--line);border-left:4px solid var(--r);border-radius:10px;padding:8px 10px;display:grid;gap:6px}
+.wz b{color:var(--r)}
+.wz small{color:var(--muted)}
+.cards{display:flex;flex-wrap:wrap;gap:6px}
+.cardmini{border:2px solid var(--r);border-radius:8px;padding:4px 6px;font-size:12px;font-weight:800}
+.page{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px;line-height:1.4}
+.page.locked{color:var(--muted);font-style:italic}
+.page b{font-family:var(--display);font-size:15px}
+.shake{animation:shake .25s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media (prefers-reduced-motion:reduce){.res span.bump{animation:none}.tile,.face{transition:none}}
+</style>
+
+<div id="app">
+  <div id="sceneWrap">
+    <canvas id="scene"></canvas>
+    <div id="dayBtns">
+      <button id="btnGate" type="button">🪵 Cổng (12)</button>
+      <button id="btnHeal" type="button">🩹 5💎</button><button id="btnAd" type="button">📺 +4💎</button>
+      <button id="btnNight" type="button">🌙 Đêm</button>
+    </div>
+    <div id="banner"></div>
+  </div>
+  <div id="hud">
+    <div class="res">
+      <span id="r0">🥩 0</span><span id="r1">🪵 0</span><span id="r2">💠 0</span><span id="r3">🪙 0</span><span id="rg">💎 0</span>
+    </div>
+    <button id="btnBook" type="button">📖</button>
+    <span id="phase">NGÀY 1</span>
+    <div id="gateBar" title="Máu cổng làng"><div id="gateFill"></div></div>
+  </div>
+  <div id="boardWrap"><div id="board"></div></div>
+</div>
+<div id="panel" class="overlay"><div class="card" id="panelCard">
+  <h2>Mythkeep: Match &amp; Defend</h2>
+  <p><b>Ban ngày:</b> vuốt đổi ô để ghép 3. Mỗi ô cho đúng số +N ghi trên ô. Chạm công trình để nâng cấp và thuê dân (mỗi dân +1 cho ô mới rơi). Chạm pháp sư ở cổng để nâng cấp hoặc đổi người. Quán rượu: 1 💎 một lượt quay thẻ.</p>
+  <p><b>Ban đêm:</b> ghép ra nguyên tố, pháp sư cùng màu bắn quái. Ghép 4 = Quả cầu, ghép L/T = Chữ thập (cột từ trời, chí mạng 150%), ghép 5 = 🌈. Chạm 🌈 để ăn hết ô cùng màu với nó. Đổi 2 ô đặc biệt <b>khác màu</b> (cả 🌈, mang màu của lần ghép 5 tạo ra nó) = phép cấp 2. Khắc: 💧→🔥→🌪️→🪨→💧.</p>
+  <p>Bản thử tặng sẵn 10 💎 để thử quán rượu.</p>
+  <label class="row" style="justify-content:center"><input type="checkbox" id="slow"> Chế độ chậm (quái đi 7 giây)</label>
+  <button id="btnStart" type="button">Bắt đầu</button>
+</div></div>
+
+<script>
+const ROWS=7, COLS=7, DAY_LEN=120, NIGHT_SPAWN=45, SPAWN_EVERY=2;
+const COL=['#e4572e','#3fb37f','#2f80ed','#e8b730'];
+const DAY=['🥩','🪵','💠','🪙'], NIGHT=['🔥','🌪️','💧','🪨'], ELN=['Lửa','Khí','Nước','Đất'];
+const BLD=['Trại săn','Xưởng gỗ','Đền thờ','Mỏ vàng'];
+const BEATS={2:0,0:1,1:3,3:2}; // Nước>Lửa>Khí>Đất>Nước
+const mult=(c,e)=>BEATS[c]===e?2:(BEATS[e]===c?.5:1);
+const counterOf=e=>+Object.keys(BEATS).find(k=>BEATS[k]===e);
+const RAR=[{n:'Thường',m:1,col:'#9aa0a6'},{n:'Tinh anh',m:1.25,col:'#4aa3ff'},{n:'Anh hùng',m:1.6,col:'#b36bff'},{n:'Anh hùng sử thi',m:2,col:'#ff7a45'},{n:'Huyền thoại',m:2.5,col:'#ffd23f'}];
+// Bản đầu 13 pháp sư: mỗi nguyên tố 1 Thường, 1 Anh hùng, 1 Anh hùng sử thi; thêm 1 Huyền thoại mang cả 4 nguyên tố.
+// Tên theo thần thoại Hy Lạp, Bắc Âu, Châu Âu và thổ dân Mỹ, xếp phẩm chất theo sức mạnh trong truyện.
+const WNAMES=[['Salamander','Prometheus','Surtr'],['Sylph','Raven','Zeus'],['Undine','Ægir','Poseidon'],['Gnome','Merlin','Gaia']];
+const RTIER=[0,2,3];
+const WIZ=[];WNAMES.forEach((row,el)=>row.forEach((name,i)=>WIZ.push({id:el*3+i,el,r:RTIER[i],name})));
+const LEGEND=12;WIZ.push({id:LEGEND,el:4,r:4,name:'Hermes Trismegistus'});
+COL.push('#ffd23f');NIGHT.push('✨');ELN.push('Tứ nguyên');
+const SLOTX=[.1,.3,.7,.9]; // 4 bệ; Huyền thoại có thể đứng thay pháp sư ở bất kỳ bệ nào
+const PAIR={'0-1':['Bão lửa','cháy 3 giây (10%/giây)'],'0-3':['Dung nham','cháy mạnh 3 giây (15%/giây)'],'0-2':['Hơi nước','mù, đứng yên 1 giây'],
+  '1-3':['Bão cát','đẩy lùi 20% màn hình'],'1-2':['Bão tuyết','đóng băng 2 giây'],'2-3':['Lũ bùn','chậm 50% trong 4 giây']};
+// Hình dạng phép cấp 2: sức mạnh Quả cầu < Chữ thập < Cầu vồng
+const SHAPE={oo:['Vùng','Quả cầu với Quả cầu','nổ 5×5 trên bàn; nổ vùng lớn quanh quái gần nhất',1],
+  oc:['Cột nổ','Quả cầu với Chữ thập','xoá 3 hàng 3 cột; cột giáng xuống quái gần nhất rồi nổ lan',1.25],
+  cc:['Cột đôi','Chữ thập với Chữ thập','xoá 2 hàng 2 cột; 2 cột giáng xuống 2 quái gần nhất',1.5],
+  ro:['Mưa sao','Cầu vồng với Quả cầu','mọi ô cùng màu Quả cầu hoá Quả cầu và nổ; nổ vùng trên 5 quái gần nhất',1.75],
+  rc:['Thiên phạt','Cầu vồng với Chữ thập','mọi ô cùng màu Chữ thập hoá Chữ thập và nổ; 5 cột giáng xuống 5 quái gần nhất',2]};
+const pairKey=(a,b)=>a<b?`${a}-${b}`:`${b}-${a}`;
+
+const S={phase:'day',night:1,t:0,res:[0,0,0,18],gems:10,bld:[0,0,0,0],workers:[0,0,0,0],
+  cards:Array(13).fill(0),owned:{},gateW:[0,3,6,9],exp:0,pity:0,book:{},power:1,gateStart:10,
+  gate:10,gateMax:10,hungry:false,mons:[],fx:[],pops:[],nextSpawn:0,busy:false,slow:false,trans:null,paused:true,shake:0,
+  bossEl:Math.floor(Math.random()*4),bossOut:false};
+[0,3,6,9].forEach(id=>S.owned[id]={lv:1,pot:0});
+const $=id=>document.getElementById(id);
+const boardEl=$('board'), canvas=$('scene'), ctx=canvas.getContext('2d');
+let grid=[], uid=0, cell=48, dpr=1; const tileEls=new Map();
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const key=(r,c)=>r*COLS+c, dek=k=>[Math.floor(k/COLS),k%COLS];
+const rnd=n=>Math.floor(Math.random()*n);
+const T=(c,sp=null,v)=>({id:++uid,c,sp,v:v??1+S.workers[c]});
+const matchable=t=>t&&t.sp!=='gem'&&t.sp!=='rainbow';
+const isSp=t=>t&&(t.sp==='orb'||t.sp==='cross');
+
+/* ---------- board ---------- */
+function initGrid(){
+  grid=[...Array(ROWS)].map(()=>Array(COLS).fill(null));
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+    let col; do{col=rnd(4)}while((c>1&&grid[r][c-1].c===col&&grid[r][c-2].c===col)||(r>1&&grid[r-1][c].c===col&&grid[r-2][c].c===col));
+    grid[r][c]=T(col);
+  }
+}
+function findRuns(){
+  const runs=[],h=new Set(),v=new Set();
+  const scan=(get,len,outer,isH)=>{for(let o=0;o<outer;o++){let i=0;while(i<len){const t=get(o,i);if(!matchable(t)){i++;continue}
+    let j=i;while(j+1<len&&matchable(get(o,j+1))&&get(o,j+1).c===t.c)j++;
+    if(j-i>=2){const cells=[];for(let x=i;x<=j;x++)cells.push(isH?key(o,x):key(x,o));runs.push({cells,color:t.c});cells.forEach(k=>(isH?h:v).add(k))}
+    i=j+1}}};
+  scan((r,c)=>grid[r][c],COLS,ROWS,true);
+  scan((c,r)=>grid[r][c],ROWS,COLS,false);
+  return {runs,h,v};
+}
+function render(){
+  const seen=new Set();
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const t=grid[r][c];if(!t)continue;seen.add(t.id);
+    let el=tileEls.get(t.id);
+    if(!el){el=document.createElement('div');el.className='tile';el.innerHTML='<div class="face"></div>';boardEl.appendChild(el);tileEls.set(t.id,el);
+      el.style.transform=`translate(${c*cell}px,${(t.from??r)*cell}px)`;el.getBoundingClientRect();delete t.from}
+    el.style.width=el.style.height=cell+'px';
+    el.style.transform=`translate(${c*cell}px,${r*cell}px)`;
+    el.dataset.c=matchable(t)?t.c:'';el.dataset.sp=t.sp||'';if(t.sp==='rainbow')el.style.setProperty('--rc',COL[t.c]);
+    const face=el.firstChild;
+    const icon=t.sp==='gem'?'💎':t.sp==='rainbow'?'🌈':(S.phase==='night'?NIGHT:DAY)[t.c];
+    const badge=(t.sp==='orb'?'<span class="badge">◉</span>':t.sp==='cross'?'<span class="badge">✚</span>':t.sp==='rainbow'?`<span class="badge">${NIGHT[t.c]}</span>`:'')+(matchable(t)?`<span class="val">+${t.v}</span>`:'');
+    const html=icon+badge; if(face.dataset.h!==html){face.innerHTML=html;face.dataset.h=html}
+  }
+  for(const [id,el] of tileEls) if(!seen.has(id)){tileEls.delete(id);el.classList.add('pop');setTimeout(()=>el.remove(),170)}
+}
+function gravity(){
+  for(let c=0;c<COLS;c++){let w=ROWS-1;
+    for(let r=ROWS-1;r>=0;r--)if(grid[r][c]){if(r!==w){grid[w][c]=grid[r][c];grid[r][c]=null}w--}
+    const n=w+1;for(let r=w;r>=0;r--){const t=T(rnd(4));t.from=r-n;grid[r][c]=t}}
+}
+function expand(clear,events){
+  const q=[...clear],done=new Set();
+  const add=(r,c)=>{if(r<0||c<0||r>=ROWS||c>=COLS)return;const k=key(r,c),t=grid[r][c];if(matchable(t)&&!clear.has(k)){clear.add(k);q.push(k)}};
+  while(q.length){const k=q.pop();if(done.has(k))continue;done.add(k);const [r,c]=dek(k),t=grid[r][c];if(!t)continue;
+    if(t.sp==='orb'){events.push({sp:'orb',c:t.c});for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++)add(r+dr,c+dc)}
+    if(t.sp==='cross'){events.push({sp:'cross',c:t.c});for(let x=0;x<COLS;x++)add(r,x);for(let y=0;y<ROWS;y++)add(y,c)}}
+}
+function tally(clear){const n=[0,0,0,0];for(const k of clear){const [r,c]=dek(k),t=grid[r][c];if(matchable(t))n[t.c]+=t.v}return n}
+function removeCells(clear){for(const k of clear){const [r,c]=dek(k);grid[r][c]=null}}
+async function settle(){render();await wait(170);gravity();render();await wait(230)}
+
+async function resolve(focus=[]){
+  let casc=0;
+  while(true){
+    const {runs,h,v}=findRuns(); if(!runs.length)break; casc++;
+    const clear=new Set(),spawns=[],events=[];
+    for(const run of runs){run.cells.forEach(k=>clear.add(k));
+      const pos=run.cells.find(k=>focus.includes(k))??run.cells[Math.floor(run.cells.length/2)];
+      if(run.cells.length>=5)spawns.push({k:pos,sp:S.phase==='night'?'rainbow':'gem',c:run.color});
+      else if(run.cells.length===4)spawns.push({k:pos,sp:'orb',c:run.color});}
+    for(const k of h)if(v.has(k)&&!spawns.some(s=>s.k===k)){const [r,c]=dek(k);spawns.push({k,sp:'cross',c:grid[r][c].c})}
+    expand(clear,events);
+    const counts=tally(clear);
+    spawns.forEach(s=>clear.delete(s.k));
+    apply(counts,events,casc);
+    removeCells(clear);
+    for(const s of spawns){const [r,c]=dek(s.k);const old=grid[r][c];const t=T(s.c,s.sp,old?.v);if(old)t.id=old.id;grid[r][c]=t}
+    await settle();
+    focus=[];
+  }
+  if(!hasMoves()){initGridKeepGems();render();banner('Xáo bàn')}
+}
+function initGridKeepGems(){const keep=[];grid.forEach((row,r)=>row.forEach((t,c)=>{if(t&&!matchable(t))keep.push([r,c,t])}));initGrid();keep.forEach(([r,c,t])=>grid[r][c]=t)}
+function hasMoves(){for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)for(const [dr,dc] of [[0,1],[1,0]]){const r2=r+dr,c2=c+dc;if(r2>=ROWS||c2>=COLS)continue;
+  const a=grid[r][c],b=grid[r2][c2];if(a.sp==='rainbow'||b.sp==='rainbow'||(isSp(a)&&isSp(b)))return true;
+  grid[r][c]=b;grid[r2][c2]=a;const ok=findRuns().runs.length>0;grid[r][c]=a;grid[r2][c2]=b;if(ok)return true}return false}
+
+/* ---------- wizards ---------- */
+function gateWiz(c){const id=S.gateW[c];if(id==null||!S.owned[id])return null;return {...WIZ[id],...S.owned[id]}}
+function power(c){const w=gateWiz(c);if(!w)return 0;return w.lv*RAR[w.r].m*(1+.2*w.pot)*(S.hungry?.75:1)}
+const lvCap=w=>5+5*w.pot;
+
+/* ---------- spell book ---------- */
+const BOOK=[];
+for(let c=0;c<4;c++){
+  BOOK.push({k:`bolt-${c}`,lv:1,name:`Tia ${ELN[c]}`,how:`Ghép 3 ô ${NIGHT[c]} ban đêm.`,dmg:'Số nguyên tố × sức pháp sư × khắc chế.',fx:'Bắn vào quái gần cổng nhất.'});
+  BOOK.push({k:`orb-${c}`,lv:1,name:`Quả cầu ${ELN[c]}`,how:`Ghép 4 thẳng ô ${NIGHT[c]} tạo ô Quả cầu ◉, rồi ghép ô đó.`,dmg:'Số nguyên tố × sức pháp sư × khắc chế, cho mọi quái trong vùng nổ.',fx:'Bàn nổ 3×3; quả cầu nổ quanh quái gần nhất.'});
+  BOOK.push({k:`pillar-${c}`,lv:1,name:`Cột ${ELN[c]}`,how:`Ghép chữ L/T ô ${NIGHT[c]} tạo ô Chữ thập ✚, rồi ghép ô đó.`,dmg:'Số nguyên tố × sức pháp sư × khắc chế × 1,5 (luôn chí mạng).',fx:'Bàn xoá hàng và cột; cột giáng từ trời xuống quái gần nhất.'});
+  BOOK.push({k:`zap-${c}`,lv:1,name:`Ngũ lôi ${ELN[c]}`,how:`Ghép 5 ô ${NIGHT[c]} ban đêm tạo 🌈 ${NIGHT[c]}, rồi chạm vào 🌈.`,dmg:'Mỗi tia = số nguyên tố × sức pháp sư × khắc chế.',fx:`Ăn hết ô ${NIGHT[c]} trên bàn; 5 tia sét vào quái ${NIGHT[BEATS[c]]} (bị ${ELN[c]} khắc), thừa thì vào quái gần nhất.`});
+}
+BOOK.push({k:'hand',lv:1,name:'Bàn tay thần',how:'Đổi 2 ô 🌈 với nhau.',dmg:'Tiêu diệt mọi quái trên đồng cỏ.',fx:'Xoá toàn bộ bàn ghép.'});
+for(const pk of Object.keys(PAIR))for(const sh of Object.keys(SHAPE)){const [a,b]=pk.split('-').map(Number);
+  BOOK.push({k:`L2-${pk}-${sh}`,lv:2,name:`${PAIR[pk][0]} · ${SHAPE[sh][0]}`,how:`Đổi ${SHAPE[sh][1]}, một ô ${NIGHT[a]} và một ô ${NIGHT[b]}.`,
+    dmg:`Tổng nguyên tố × sức trung bình 2 pháp sư × 2 (cấp 2) × ${String(SHAPE[sh][3]).replace('.',',')} (hình dạng) × khắc chế (lấy hệ có lợi hơn của ${NIGHT[a]} và ${NIGHT[b]}).`,
+    fx:`${SHAPE[sh][2]}. Thêm: ${PAIR[pk][1]}.`})}
+function unlock(k,dmg){const page=BOOK.find(b=>b.k===k);if(!page)return;const e=S.book[k];
+  if(!e){S.book[k]={uses:1,best:dmg};banner(`📖 Mở khoá: ${page.name}`);hud()}else{e.uses++;e.best=Math.max(e.best,dmg)}}
+
+/* ---------- effects ---------- */
+function apply(counts,events,casc){
+  if(S.phase==='day'){
+    counts.forEach((n,c)=>{if(!n)return;const u=n;S.res[c]+=u;bump('r'+c);
+      S.pops.push({x:40+c*70+rnd(30),y:110+rnd(30),text:`+${u}${DAY[c]}`,col:COL[c],t:0})});
+    hud();return;
+  }
+  const tot=counts.reduce((a,b)=>a+b,0);
+  const li=S.gateW.indexOf(LEGEND);if(tot&&li>=0)legendAttack(tot,li);
+  const l2=events.find(e=>e.sp==='L2');
+  if(l2){cast2(l2.a,l2.b,l2.shape,tot);return}
+  counts.forEach((n,c)=>{if(!n)return;const ev=events.filter(e=>e.c===c).map(e=>e.sp);
+    const mode=ev.includes('zap')?'zap':ev.includes('cross')?'cross':ev.includes('orb')?'orb':'bolt';
+    if(S.gateW[c]!==LEGEND)attack(c,n,mode)});
+}
+function legendAttack(n,li){const pw=power(li);if(!pw)return;const list=alive();if(!list.length)return;const t0=list[0];const [wx,wy]=wizPos(li),[tx,ty]=monPos(t0);
+  hit(t0,n*pw*2,4);S.fx.push({k:'bolt',x0:wx,y0:wy,x1:tx,y1:ty,c:4,t:0})} // Huyền thoại khắc mọi nguyên tố: luôn ×2
+function wizPos(i){const W=canvas.width/dpr,H=canvas.height/dpr;return [W*SLOTX[i],H-30]}
+function monPos(m){const W=canvas.width/dpr,H=canvas.height/dpr;return [m.x*W,10+m.y*(H-62)]}
+const alive=()=>S.mons.filter(m=>m.hp>0).sort((a,b)=>b.y-a.y);
+function attack(c,n,mode){
+  const [wx,wy]=wizPos(c);const pw=power(c);
+  if(!pw){S.pops.push({x:wx,y:wy-30,text:'chưa có',col:'#aaa',t:0});return}
+  const list=alive();if(!list.length)return;
+  const base=n*pw;const t0=list[0];const [tx,ty]=monPos(t0);let total=0;
+  if(mode==='bolt'){total+=hit(t0,base*mult(c,t0.el),c);S.fx.push({k:'bolt',x0:wx,y0:wy,x1:tx,y1:ty,c,t:0});unlock(`bolt-${c}`,total)}
+  else if(mode==='orb'){for(const m of list){const [mx,my]=monPos(m);if(Math.hypot(mx-tx,my-ty)<70)total+=hit(m,base*mult(c,m.el),c)}S.fx.push({k:'orb',x1:tx,y1:ty,c,t:0,r:70});unlock(`orb-${c}`,total)}
+  else if(mode==='cross'){total+=hit(t0,base*mult(c,t0.el)*1.5,c,true);S.fx.push({k:'pillar',x1:tx,y1:ty,c,t:0});unlock(`pillar-${c}`,total)}
+  else if(mode==='zap'){for(let i=0;i<5;i++){const live=alive();if(!live.length)break;
+      const m=live.find(m=>BEATS[c]===m.el)||live[0];total+=hit(m,base*mult(c,m.el),c);const [mx,my]=monPos(m);S.fx.push({k:'zap',x0:wx,y0:wy,x1:mx,y1:my,c,t:-i*.06})}
+    unlock(`zap-${c}`,total)}
+}
+function cast2(a,b,shape,n){
+  const pk=pairKey(a,b);const pa=power(a),pb=power(b);
+  if(!pa||!pb){banner('Cần đủ 2 pháp sư cho phép cấp 2');return}
+  const list=alive();if(!list.length){unlock(`L2-${pk}-${shape}`,0);return}
+  const base=n*(pa+pb)/2*2*SHAPE[shape][3];const best=m=>Math.max(mult(a,m.el),mult(b,m.el));let total=0;const hitList=new Set();
+  const t0=list[0];const [tx,ty]=monPos(t0);
+  const aoe=(cx,cy,r,col,crit)=>{for(const m of alive()){const [mx,my]=monPos(m);if(Math.hypot(mx-cx,my-cy)<r){total+=hit(m,base*best(m),col,crit);hitList.add(m)}}S.fx.push({k:'orb',x1:cx,y1:cy,c:col,t:0,r})};
+  const pillar=(m,col)=>{total+=hit(m,base*best(m),col,true);hitList.add(m);const [mx,my]=monPos(m);S.fx.push({k:'pillar',x1:mx,y1:my,c:col,t:0})};
+  if(shape==='oo'){aoe(tx,ty,140,a);S.fx.push({k:'orb',x1:tx,y1:ty,c:b,t:-.08,r:140})}
+  else if(shape==='oc'){pillar(t0,a);for(const m of list.slice(1)){const [mx,my]=monPos(m);if(Math.hypot(mx-tx,my-ty)<80){total+=hit(m,base*best(m),b);hitList.add(m)}}S.fx.push({k:'orb',x1:tx,y1:ty,c:b,t:0,r:80})}
+  else if(shape==='cc'){list.slice(0,2).forEach((m,i)=>pillar(m,i?b:a))}
+  else if(shape==='ro'){list.slice(0,5).forEach((m,i)=>{if(m.hp>0){const [mx,my]=monPos(m);aoe(mx,my,60,i%2?b:a)}})}
+  else{list.slice(0,5).forEach((m,i)=>pillar(m,i%2?b:a))}
+  for(const m of hitList){
+    if(pk==='0-1'){m.burn=3;m.burnDps=base*.1}
+    else if(pk==='0-3'){m.burn=3;m.burnDps=base*.15}
+    else if(pk==='0-2')m.stun=Math.max(m.stun||0,1);
+    else if(pk==='1-3')m.y=Math.max(0,m.y-.2);
+    else if(pk==='1-2')m.stun=Math.max(m.stun||0,2);
+    else if(pk==='2-3')m.slow=4;}
+  banner(`✨ ${PAIR[pk][0]} · ${SHAPE[shape][0]}`);
+  unlock(`L2-${pk}-${shape}`,total);
+}
+function hit(m,d,c,crit){d=Math.round(d*10)/10;m.hp-=d;const [x,y]=monPos(m);S.pops.push({x,y:y-14,text:crit?`CRIT ${d}`:String(d),col:COL[c],t:0,big:crit||d>=10});return d}
+
+/* ---------- swaps ---------- */
+async function trySwap(r1,c1,r2,c2){
+  if(S.busy||S.paused||S.trans||r2<0||c2<0||r2>=ROWS||c2>=COLS)return;
+  const a=grid[r1][c1],b=grid[r2][c2];S.busy=true;
+  try{
+    if(a.sp==='gem'||b.sp==='gem'){
+      if(a.sp==='gem'&&b.sp==='gem'){S.gems+=5;bump('rg');hud();banner('+5 💎');removeCells([key(r1,c1),key(r2,c2)]);await settle();await resolve()}
+      return}
+    if(a.sp==='rainbow'&&b.sp==='rainbow'){await godsHand([key(r1,c1),key(r2,c2)]);return}
+    if((a.sp==='rainbow'&&isSp(b))||(b.sp==='rainbow'&&isSp(a))){const [rk,rb,o]=a.sp==='rainbow'?[key(r1,c1),a,b]:[key(r2,c2),b,a];await colorBomb(rk,o,rb);return}
+    grid[r1][c1]=b;grid[r2][c2]=a;render();await wait(180);
+    if(isSp(a)&&isSp(b)){await combo(r1,c1,r2,c2,b,a);return}
+    if(findRuns().runs.length)await resolve([key(r1,c1),key(r2,c2)]);
+    else{grid[r1][c1]=a;grid[r2][c2]=b;render();await wait(180)}
+  }finally{S.busy=false}
+}
+async function blast(clear,events){
+  expand(clear,events);const counts=tally(clear);apply(counts,events,1);removeCells(clear);await settle();await resolve();
+}
+async function colorBomb(rk,o,rb){
+  const clear=new Set(),events=[];const color=o.c;
+  if(isSp(o)&&rb.c!==o.c)events.push({sp:'L2',a:rb.c,b:o.c,shape:o.sp==='orb'?'ro':'rc'});
+  grid.forEach((row,r)=>row.forEach((t,c)=>{if(matchable(t)&&t.c===color){if(isSp(o))t.sp=o.sp;clear.add(key(r,c))}}));
+  if(!isSp(o))events.push({sp:'zap',c:color});
+  removeCells([rk]);render();await wait(120);
+  await blast(clear,events);
+}
+async function godsHand(keys){
+  const clear=new Set();grid.forEach((row,r)=>row.forEach((t,c)=>{if(matchable(t))clear.add(key(r,c))}));
+  removeCells(keys);
+  if(S.phase==='night'){for(const m of S.mons)if(m.hp>0){m.hp=0;const [x,y]=monPos(m);S.pops.push({x,y,text:'✋',col:'#fff',t:0,big:true})}
+    S.fx.push({k:'hand',t:0});unlock('hand',0)}
+  banner('✋ BÀN TAY THẦN');
+  const counts=tally(clear);if(S.phase==='day')apply(counts,[],1);
+  removeCells(clear);await settle();await resolve();
+}
+async function combo(r1,c1,r2,c2,A,B){ // A ở (r1,c1), B ở (r2,c2)
+  const clear=new Set([key(r1,c1),key(r2,c2)]),events=[];
+  const add=(r,c)=>{if(r>=0&&c>=0&&r<ROWS&&c<COLS&&matchable(grid[r][c]))clear.add(key(r,c))};
+  const shape=A.sp==='orb'&&B.sp==='orb'?'oo':A.sp==='cross'&&B.sp==='cross'?'cc':'oc'; // khác màu => phép cấp 2
+  if(shape==='oo'){for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++)add(r2+dr,c2+dc)}
+  else if(shape==='oc'){for(let d=-1;d<=1;d++){for(let x=0;x<COLS;x++)add(r2+d,x);for(let y=0;y<ROWS;y++)add(y,c2+d)}}
+  else{for(const [r,c] of [[r1,c1],[r2,c2]]){for(let x=0;x<COLS;x++)add(r,x);for(let y=0;y<ROWS;y++)add(y,c)}}
+  A.sp=null;B.sp=null;
+  if(A.c!==B.c)events.push({sp:'L2',a:A.c,b:B.c,shape});
+  else{const sp=shape==='oo'?'orb':'cross';events.push({sp,c:A.c})}
+  await blast(clear,events);
+}
+function tapCell(r,c){
+  const t=grid[r]?.[c];if(!t||S.busy||S.paused||S.trans)return;
+  if(t.sp==='gem'){S.gems+=1;bump('rg');hud();grid[r][c]=null;S.busy=true;
+    (async()=>{await settle();await resolve();S.busy=false})()}
+  if(t.sp==='rainbow'){ // chạm cầu vồng: ăn hết ô cùng màu với nó
+    const clear=new Set();grid.forEach((row,rr)=>row.forEach((u,cc)=>{if(matchable(u)&&u.c===t.c)clear.add(key(rr,cc))}));
+    grid[r][c]=null;S.busy=true;(async()=>{await blast(clear,[{sp:'zap',c:t.c}]);S.busy=false})()}
+}
+
+/* ---------- input ---------- */
+let down=null;
+boardEl.addEventListener('pointerdown',e=>{const b=boardEl.getBoundingClientRect();down={x:e.clientX,y:e.clientY,r:Math.floor((e.clientY-b.top)/cell),c:Math.floor((e.clientX-b.left)/cell),moved:false};boardEl.setPointerCapture(e.pointerId)});
+boardEl.addEventListener('pointermove',e=>{if(!down||down.moved)return;const dx=e.clientX-down.x,dy=e.clientY-down.y;if(Math.hypot(dx,dy)<cell*.3)return;down.moved=true;
+  const [dr,dc]=Math.abs(dx)>Math.abs(dy)?[0,Math.sign(dx)]:[Math.sign(dy),0];trySwap(down.r,down.c,down.r+dr,down.c+dc)});
+boardEl.addEventListener('pointerup',()=>{if(down&&!down.moved)tapCell(down.r,down.c);down=null});
+canvas.addEventListener('click',e=>{if(S.phase!=='day'||S.trans||S.paused)return;const b=canvas.getBoundingClientRect();const x=e.clientX-b.left,y=e.clientY-b.top;
+  const W=b.width,H=b.height;
+  for(let i=0;i<4;i++){if(Math.hypot(x-W*SLOTX[i],y-40)<26){openRoster(i);return}}
+  for(let i=0;i<5;i++){if(Math.abs(x-W*(.1+.2*i))<W*.09&&Math.abs(y-H*.6)<34){i<4?openBuilding(i):openTavern();return}}});
+$('btnGate').onclick=()=>{if(S.res[1]>=12){S.res[1]-=12;S.gateMax+=2;S.gate=S.gateMax;banner('Cổng chắc hơn');hud()}else banner('Cần 12 🪵')};
+$('btnHeal').onclick=()=>{if(S.gate>=S.gateMax)return banner('Cổng đầy máu');if(S.gems<5)return banner('Cần 5 💎');S.gems-=5;S.gate=Math.min(S.gateMax,S.gate+Math.ceil(S.gateMax/2));banner('Cổng hồi 50%');hud()};
+$('btnAd').onclick=()=>watchAd();
+$('btnNight').onclick=()=>{if(S.phase==='day'&&!S.trans&&!S.paused)startNight()};
+$('btnBook').onclick=()=>openBook();
+$('btnStart').onclick=()=>{S.started=true;S.slow=$('slow').checked;closePanel();banner('NGÀY 1')};
+
+/* ---------- panels ---------- */
+let wasPaused=false;
+function openPanel(html,full){$('panel').classList.toggle('full',!!full);wasPaused=S.paused;S.paused=true;$('panelCard').innerHTML=html+'<button type="button" id="pClose">Đóng</button>';$('panel').hidden=false;$('pClose').onclick=closePanel}
+function closePanel(){S.openB=null;$('panel').hidden=true;S.paused=false;hud()}
+function refresh(fn){const sc=$('panelCard').scrollTop;fn();$('panelCard').scrollTop=sc}
+function openBuilding(i){S.openB=i;
+  const L=S.bld[i],k=S.workers[i],up=[Math.round(10*1.6**L),Math.round(5*1.6**L)],hire=Math.round(8*1.5**k);
+  openPanel(`<h2>${BLD[i]}</h2><p>Kho: ${S.res.map((v,j)=>`${DAY[j]} ${v}`).join(' · ')} · ⏸ giờ ban ngày đang dừng</p><p>Cấp ${L} · dân ${k}/${L}. Ô ${DAY[i]} mới rơi: <b>+${1+k}</b>. Mỗi cấp mở 1 chỗ dân; mỗi dân +1 cho ô mới rơi. Dân ăn 1 🥩 mỗi bình minh.</p><p>Tự sản xuất: <b>+${k} ${DAY[i]} mỗi 15 giây</b> (mỗi dân 1), kể cả khi đang ở đây. Tắt game vẫn sản xuất, tích tối đa 3 giờ (thẻ tháng: 6 hoặc 10 giờ).</p>
+   <div class="row"><button id="bUp" type="button">Nâng cấp (${up[0]}🪵 ${up[1]}🪙)</button><button id="bHire" type="button" ${k>=L?'disabled':''}>Thuê dân (${hire}🪙)</button></div>`,true);
+  $('bUp').onclick=()=>{if(S.res[1]>=up[0]&&S.res[3]>=up[1]){S.res[1]-=up[0];S.res[3]-=up[1];S.bld[i]++;refresh(()=>openBuilding(i))}else banner('Thiếu tài nguyên')};
+  $('bHire').onclick=()=>{if(k<L&&S.res[3]>=hire){S.res[3]-=hire;S.workers[i]++;refresh(()=>openBuilding(i))}else banner('Thiếu vàng')};
+}
+const featured=()=>WIZ[LEGEND];
+// Tỷ lệ công bố (bản 13 pháp sư, chưa có Tinh anh): Thường 90%, Anh hùng 8,99%, Anh hùng sử thi 1% (chắc chắn ở lượt 100), Huyền thoại 0,01%
+function rollRarity(){S.pity++;let x=Math.random()*100;
+  if(x<.01){S.pity=0;return 4}if(x<1.01||S.pity>=100){S.pity=0;return 3}if(x<10)return 2;return 0}
+function pull(n){if(S.gems<n){banner(`Cần ${n} 💎`);return []}S.gems-=n;const got=[];
+  for(let i=0;i<n;i++){let r=rollRarity();const pool=r===4?[featured()]:WIZ.filter(w=>w.r===r&&w.el<4);const w=pool[rnd(pool.length)];S.cards[w.id]++;got.push(w)}
+  return got}
+function openTavern(last=[]){
+  const f=featured(),wk=Math.floor((S.night-1)/7);
+  openPanel(`<h2>Quán rượu</h2><p><b>Sự kiện tuần (đêm ${wk*7+1}–${wk*7+7}):</b> ✨ <b style="color:${RAR[4].col}">${f.name}</b> ghé quán. Mang cả 4 nguyên tố, khắc mọi nguyên tố, đánh mỗi khi ăn bất kỳ ô nào. Đứng được ở bất kỳ bệ nào trong 4 bệ.</p>
+   <p>1 💎 một lượt, ra 1 thẻ pháp sư. <b>Tỷ lệ công bố:</b> Thường 90%, Anh hùng 8,99%, Anh hùng sử thi 1%, Huyền thoại 0,01%. Chắc chắn có Anh hùng sử thi ở lượt thứ 100 (còn ${100-S.pity} lượt). Đang có ${S.gems} 💎.</p>
+   <div class="row"><button id="t1" type="button">Quay 1 (1💎)</button><button id="t10" type="button">Quay 10 (10💎)</button></div>
+   ${last.length?`<div class="cards">${last.map(w=>`<span class="cardmini" style="--r:${RAR[w.r].col};border-color:${RAR[w.r].col}">${NIGHT[w.el]} ${w.name}<br><small>${RAR[w.r].n}</small></span>`).join('')}</div><p>Thẻ đã vào túi. Chạm pháp sư ở cổng để triệu hồi hoặc tăng tiềm năng.</p>`:''}`,true);
+  $('t1').onclick=()=>{const g=pull(1);hud();refresh(()=>openTavern(g))};
+  $('t10').onclick=()=>{const g=pull(10);hud();refresh(()=>openTavern(g))};
+}
+function openRoster(el){
+  const rows=WIZ.filter(w=>w.el===el||(w.id===LEGEND&&(S.owned[w.id]||S.cards[w.id]))).map(w=>{const o=S.owned[w.id],cards=S.cards[w.id],wr=o&&o.r!=null?o.r:w.r,rc=RAR[wr].col;
+    if(!o)return `<div class="wz" style="--r:${rc}"><div><b>${w.name}</b> <small>${RAR[w.r].n} · chưa có · thẻ ${cards}</small></div>
+      <div class="row"><button type="button" data-a="sum" data-id="${w.id}" ${cards<1?'disabled':''}>Triệu hồi (1 thẻ)</button></div></div>`;
+    const cap=lvCap(o),costLv=8*o.lv,needPot=4*(o.pot+1),needExp=50*(o.pot+1),atGate=S.gateW[el]===w.id;
+    return `<div class="wz" style="--r:${rc}"><div><b>${w.name}</b> <small>${o.asc?'⭐ ':''}${RAR[wr].n} ×${RAR[wr].m} · cấp ${o.lv}/${cap} · tiềm năng ${o.pot}/5 · thẻ ${cards}${atGate?' · <b>đang ở cổng</b>':''}</small></div>
+      <div class="row"><button type="button" data-a="lv" data-id="${w.id}" ${o.lv>=cap?'disabled':''}>Lên cấp (${costLv}💠)</button>
+      <button type="button" data-a="pot" data-id="${w.id}" ${o.pot>=5||cards<needPot||S.exp<needExp?'disabled':''}>Tiềm năng (${needPot} thẻ + ${needExp} KN)</button>
+      ${o.pot>=5&&!o.asc&&wr<4?`<button type="button" data-a="asc" data-id="${w.id}">⭐ Nâng lên ${RAR[wr+1].n}</button>`:''}
+      ${atGate?'':`<button type="button" data-a="gate" data-id="${w.id}">Ra cổng</button>`}</div></div>`}).join('');
+  openPanel(`<h2>Bệ ${ELN[el]} ${NIGHT[el]}</h2><p>${S.owned[LEGEND]||S.cards[LEGEND]?'Huyền thoại ✨ có thể đứng ở bệ này thay pháp sư hệ này: đánh mỗi khi ăn bất kỳ ô nào, luôn khắc chế (×2); ô hệ này không còn pháp sư riêng. ':''}Sức = cấp × phẩm chất × (1 + 0,2 × tiềm năng). Cấp tối đa = 5 + 5 × tiềm năng. Tiềm năng đủ 5 thì được nâng phẩm chất 1 lần (⭐), giữ nguyên cấp và tiềm năng, nên mạnh đúng bằng pháp sư gốc phẩm chất đó.</p>${rows}`);
+  $('panelCard').querySelectorAll('button[data-a]').forEach(btn=>btn.onclick=()=>{const id=+btn.dataset.id,a=btn.dataset.a,o=S.owned[id];
+    if(a==='sum'){S.cards[id]--;S.owned[id]={lv:1,pot:0};banner(`Triệu hồi ${WIZ[id].name}`)}
+    if(a==='lv'){if(S.res[2]>=8*o.lv){S.res[2]-=8*o.lv;o.lv++}else banner('Thiếu mana')}
+    if(a==='pot'){S.cards[id]-=4*(o.pot+1);S.exp-=50*(o.pot+1);o.pot++}
+    if(a==='asc'){o.r=WIZ[id].r+1;o.asc=true;banner(`⭐ ${WIZ[id].name} lên ${RAR[o.r].n}`)}
+    if(a==='gate'){const prev=S.gateW.indexOf(id);if(prev>=0)S.gateW[prev]=null;S.gateW[el]=id}
+    hud();refresh(()=>openRoster(el))});
+}
+function openBook(){
+  const n=Object.keys(S.book).length;
+  const page=b=>{const e=S.book[b.k];if(!e)return `<div class="page locked">??? · ${b.lv===2?'phép cấp 2':'phép cấp 1'} chưa dùng trong trận</div>`;
+    return `<div class="page"><b>${b.name}</b><br>Cách ghép: ${b.how}<br>Sát thương: ${b.dmg}<br>Hiệu ứng: ${b.fx}<br><small>Đã dùng ${e.uses} lần · đòn mạnh nhất ${Math.round(e.best)}</small></div>`};
+  openPanel(`<h2>Sách phép</h2><p>Đã mở ${n}/${BOOK.length}. Phép mở khoá khi được dùng trong trận đêm.</p><h3>Cấp 1</h3>${BOOK.filter(b=>b.lv===1).map(page).join('')}<h3>Cấp 2</h3>${BOOK.filter(b=>b.lv===2).map(page).join('')}`);
+}
+
+/* ---------- phases ---------- */
+async function flipTiles(){boardEl.classList.add('flip');await wait(160);render();boardEl.classList.remove('flip')}
+function startNight(){S.gateStart=S.gate;document.body.classList.add('night');layout();S.bossOut=false;S.trans={to:'night',p:0};S.phase='night';S.t=0;S.nextSpawn=.6;S.mons=[];flipTiles();banner(`ĐÊM ${S.night}`);$('dayBtns').hidden=true;hud()}
+function dawn(){
+  let rb=0;grid.forEach((row,r)=>row.forEach((t,c)=>{if(t&&t.sp==='rainbow'){S.exp+=5;grid[r][c]=null;rb++}}));
+  if(rb)gravity();
+  const eaters=S.gateW.filter(id=>id!=null).length+S.workers.reduce((a,b)=>a+b,0);
+  if(S.res[0]>=eaters){S.res[0]-=eaters;S.hungry=false}else{S.res[0]=0;S.hungry=true}
+  const lost=(S.gateStart-S.gate)/S.gateMax,up=lost<.3;if(up)S.power*=1.05;
+  S.trans={to:'day',p:0};S.phase='day';S.t=0;S.bossEl=rnd(4);document.body.classList.remove('night');layout();
+  banner((S.hungry?'Sống sót! Thiếu thịt: pháp sư đói':`Đêm ${S.night}: sống sót! Ăn ${eaters} 🥩`)+(up?` · cổng mất ${Math.round(lost*100)}% < 30%: quái +5% sát thương, +5% máu`:''));S.night++;
+  flipTiles();$('dayBtns').hidden=false;hud();
+}
+// Cổng về 0: trả 5💎 để hồi 50% máu và đánh tiếp; chịu thua thì mất hết tài nguyên trong kho (kim cương không bao giờ mất).
+function lose(){
+  openPanel(`<h2>Cổng vỡ!</h2><p>Hồi 50% máu cổng để đánh tiếp đêm ${S.night}? Nếu chịu thua, <b>mất hết tài nguyên trong kho</b> (🥩 🪵 💠 🪙). Kim cương, pháp sư và thẻ không mất.</p><p>Đang có ${S.gems} 💎.</p>
+   <div class="row"><button id="revive" type="button" ${S.gems<5?'disabled':''}>🩹 5💎: hồi 50% cổng</button><button id="adL" type="button">📺 Xem video +4💎</button></div><button id="giveUp" type="button">Chịu thua</button>`);
+  $('revive').onclick=()=>{S.gems-=5;S.gate=Math.ceil(S.gateMax/2);closePanel();banner('Cổng hồi 50%')};
+  $('adL').onclick=()=>{watchAd();refresh(lose)};
+  $('giveUp').onclick=()=>{S.res=[0,0,0,0];S.gate=Math.ceil(S.gateMax/2);S.gateStart=S.gate;S.mons=[];S.bossOut=false;S.t=0;S.nextSpawn=.6;closePanel();banner(`Mất hết kho. Thử lại đêm ${S.night}`)}}
+function watchAd(){S.gems+=4;bump('rg');hud();banner('📺 +4 💎')} // bản chơi thử: giả lập xem xong video
+
+/* ---------- loop ---------- */
+let last=performance.now();
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+  // Công trình tự sản xuất theo thời gian thật (cả khi đang ở trong công trình): mỗi dân +1 mỗi 15 giây
+  if(S.started){S.prodT=(S.prodT||0)+dt;if(S.prodT>=15){S.prodT-=15;let any=false;S.workers.forEach((k,i)=>{if(k){S.res[i]+=k;any=true;if(S.paused)return;bump('r'+i);S.pops.push({x:40+i*70,y:120,text:`+${k}${DAY[i]} 🏠`,col:COL[i],t:0})}});if(any){hud();if(!$('panel').hidden&&$('panel').classList.contains('full')&&S.openB!=null)refresh(()=>openBuilding(S.openB))}}}
+  if(!S.paused){
+    if(S.trans){S.trans.p+=dt/.7;if(S.trans.p>=1)S.trans=null}
+    else if(S.phase==='day'){S.t+=dt;if(S.t>=DAY_LEN&&!S.busy)startNight()}
+    else{S.t+=dt;const travel=S.slow?7:5,scale=S.power;
+      if(!S.bossOut&&S.t>=38){S.bossOut=true;const hp=40*scale;S.mons.push({x:.5,y:0,el:S.bossEl,big:true,boss:true,hp,max:hp});banner(`TRÙM ${NIGHT[S.bossEl]}`)}
+      while(S.t>=S.nextSpawn&&S.nextSpawn<NIGHT_SPAWN){const big=Math.random()<.2;const hp=(big?15:6)*scale;S.mons.push({x:.12+Math.random()*.76,y:0,el:rnd(4),big,hp,max:hp});S.nextSpawn+=SPAWN_EVERY}
+      for(const m of S.mons)if(m.hp>0){
+        if(m.burn>0){m.burn-=dt;m.hp-=m.burnDps*dt}
+        if(m.stun>0){m.stun-=dt;continue}
+        const sp=m.slow>0?.5:1;if(m.slow>0)m.slow-=dt;
+        m.y+=dt*sp/(m.boss?travel*2:travel);
+        if(m.y>=1){S.gate=Math.round((S.gate-(m.boss?5:m.big?3:1)*S.power)*100)/100;m.hp=0;m.leak=true;S.shake=.25;hud()}}
+      for(const m of S.mons)if(m.hp<=0&&!m.leak&&!m.xp){m.xp=1;const g=Math.round((m.boss?10:m.big?3:1)*S.power*10)/10;S.exp=Math.round((S.exp+g)*10)/10}
+      S.mons=S.mons.filter(m=>m.hp>0||(m.dieT=(m.dieT||0)+dt)<.3);
+      if(S.gate<=0)lose();
+      else if(S.t>=NIGHT_SPAWN&&!S.mons.some(m=>m.hp>0)&&!S.busy)dawn();}
+    hudTime();
+  }
+  for(const f of S.fx)f.t+=dt;S.fx=S.fx.filter(f=>f.t<(f.k==='hand'?.9:.35));
+  for(const p of S.pops)p.t+=dt;S.pops=S.pops.filter(p=>p.t<.9);
+  if(S.shake>0)S.shake-=dt;
+  draw();requestAnimationFrame(loop)}
+
+/* ---------- drawing ---------- */
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function draw(){const W=canvas.width/dpr,H=canvas.height/dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
+  ctx.translate(S.shake>0&&!reduce?(Math.random()-.5)*8:0,0);
+  if(S.trans){const p=S.trans.p,e=p*p*(3-2*p);
+    if(S.trans.to==='night'){drawVillage(W,H,e*H);drawMeadow(W,H,(e-1)*H)}else{drawMeadow(W,H,-e*H);drawVillage(W,H,(1-e)*H)}}
+  else if(S.phase==='day')drawVillage(W,H,0);else drawMeadow(W,H,0);
+  ctx.textAlign='center';
+  for(const p of S.pops){ctx.globalAlpha=1-p.t/.9;ctx.font=`800 ${p.big?20:15}px Nunito, system-ui`;ctx.fillStyle=p.col;ctx.strokeStyle='#000';ctx.lineWidth=3;
+    ctx.strokeText(p.text,p.x,p.y-p.t*30);ctx.fillText(p.text,p.x,p.y-p.t*30)}
+  ctx.globalAlpha=1;
+  for(const f of S.fx)if(f.k==='hand'){ctx.globalAlpha=1-f.t/.9;ctx.font=`${120+f.t*80}px serif`;ctx.fillText('✋',W/2,H*.2+f.t*H*.6);ctx.globalAlpha=1}
+}
+function drawWizard(x,y,el,rad){const w=gateWiz(el);ctx.beginPath();ctx.arc(x,y,rad,0,7);
+  if(w){ctx.fillStyle=COL[w.el];ctx.fill();ctx.lineWidth=3;ctx.strokeStyle=RAR[w.r].col;ctx.stroke();ctx.font=`${rad*.9}px serif`;ctx.fillText('🧙',x,y+rad*.33)}
+  else{ctx.fillStyle='#0006';ctx.fill()}return w}
+function drawVillage(W,H,oy){ctx.save();ctx.translate(0,oy);ctx.textAlign='center';
+  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#7fb6d6');g.addColorStop(1,'#cfe3c2');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#8cbf6a';ctx.fillRect(0,H*.45,W,H);
+  ctx.fillStyle='#6b4428';ctx.fillRect(0,12,W,58);ctx.fillStyle='#8a5a35';for(let x=0;x<W;x+=14)ctx.fillRect(x,6,10,64);
+  for(let i=0;i<4;i++){const x=W*SLOTX[i],w=drawWizard(x,40,i,20);ctx.font='800 10px Nunito';ctx.fillStyle='#1d1a12';
+    ctx.fillText(w?`${w.name} Lv${w.lv}`:ELN[i],x,79)}
+  ctx.font='800 12px Nunito';ctx.fillStyle='#1d1a12';
+  ctx.fillText(`Trùm đêm nay: ${NIGHT[S.bossEl]} ${ELN[S.bossEl]} · khắc nó: ${NIGHT[counterOf(S.bossEl)]} ${ELN[counterOf(S.bossEl)]}`,W/2,H*.37);
+  for(let i=0;i<5;i++){const x=W*(.1+.2*i),y=H*.6,bw=W*.17;const tav=i===4;
+    ctx.fillStyle=tav?'#7a4b8c':'#b98a5a';ctx.fillRect(x-bw/2,y-16,bw,44);ctx.fillStyle=tav?'#3d2347':COL[i];
+    ctx.beginPath();ctx.moveTo(x-bw/2-4,y-16);ctx.lineTo(x,y-36);ctx.lineTo(x+bw/2+4,y-16);ctx.fill();
+    ctx.fillStyle=tav?'#f3ecdc':'#1d1a12';ctx.font='800 10px Nunito';
+    if(tav){ctx.fillText('Quán rượu',x,y+2);ctx.fillText('🍺 1💎/lượt',x,y+16)}
+    else{ctx.fillText(BLD[i],x,y+2);ctx.fillText(`Lv${S.bld[i]} 👤${S.workers[i]}`,x,y+14);ctx.fillText(`ô ${DAY[i]}+${1+S.workers[i]}`,x,y+26)}}
+  ctx.restore()}
+function drawMeadow(W,H,oy){ctx.save();ctx.translate(0,oy);ctx.textAlign='center';
+  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0e1630');g.addColorStop(1,'#1f3a2a');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#fff6';for(let i=0;i<20;i++)ctx.fillRect((i*97)%W,(i*53)%(H*.4),2,2);
+  const gy=H-30;ctx.fillStyle='#6b4428';ctx.fillRect(0,gy-10,W,40);ctx.fillStyle='#8a5a35';for(let x=0;x<W;x+=14)ctx.fillRect(x,gy-18,10,18);
+  for(const m of S.mons){const [x,y]=monPos(m);const r=m.boss?26:m.big?17:12;ctx.globalAlpha=m.hp>0?1:Math.max(0,1-(m.dieT||0)/.3);
+    ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fillStyle=COL[m.el];ctx.fill();
+    if(m.stun>0){ctx.lineWidth=3;ctx.strokeStyle='#bfe8ff';ctx.stroke()}if(m.burn>0){ctx.lineWidth=3;ctx.strokeStyle='#ff9a3c';ctx.stroke()}if(m.slow>0){ctx.lineWidth=3;ctx.strokeStyle='#7a5a3a';ctx.stroke()}
+    ctx.font=`${r*1.2}px serif`;ctx.fillText(m.boss?'👹':'🐺',x,y+r*.4);
+    if(m.hp>0){ctx.fillStyle='#000a';ctx.fillRect(x-r,y-r-8,r*2,4);ctx.fillStyle='#fff';ctx.fillRect(x-r,y-r-8,r*2*Math.max(0,m.hp/m.max),4)}
+    ctx.font='11px serif';ctx.fillText(NIGHT[m.el],x+r,y-r);ctx.globalAlpha=1}
+  for(const f of S.fx){if(f.t<0||f.k==='hand')continue;const a=Math.max(0,1-f.t/.35);ctx.globalAlpha=a;ctx.strokeStyle=COL[f.c];ctx.fillStyle=COL[f.c];
+    if(f.k==='bolt'){ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(f.x0,f.y0);ctx.lineTo(f.x1,f.y1);ctx.stroke()}
+    if(f.k==='orb'){ctx.beginPath();ctx.arc(f.x1,f.y1,f.r*(.3+f.t*2),0,7);ctx.lineWidth=6;ctx.stroke()}
+    if(f.k==='pillar'){ctx.fillRect(f.x1-14*a-4,0,28*a+8,f.y1+16);ctx.beginPath();ctx.arc(f.x1,f.y1,22+f.t*60,0,7);ctx.lineWidth=4;ctx.stroke()}
+    if(f.k==='zap'){ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(f.x0,f.y0);for(let i=1;i<6;i++)ctx.lineTo(f.x0+(f.x1-f.x0)*i/6+(Math.random()-.5)*16,f.y0+(f.y1-f.y0)*i/6);ctx.lineTo(f.x1,f.y1);ctx.stroke()}
+    ctx.globalAlpha=1}
+  for(let i=0;i<4;i++){const [x,y]=wizPos(i);const w=drawWizard(x,y,i,16);if(w){ctx.font='800 10px Nunito';ctx.fillStyle='#fff';ctx.fillText('Lv'+w.lv,x+18,y-12)}}
+  ctx.restore()}
+
+/* ---------- HUD ---------- */
+function bump(id){const el=$(id);el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}
+function hud(){['r0','r1','r2','r3'].forEach((id,i)=>$(id).textContent=`${DAY[i]} ${S.res[i]}`);$('rg').textContent=`💎 ${S.gems}`;
+  $('gateFill').style.width=Math.max(0,100*S.gate/S.gateMax)+'%';$('gateBar').title=`Máu cổng ${S.gate}/${S.gateMax}`;
+  $('btnBook').textContent=`📖 ${Object.keys(S.book).length}/${BOOK.length}`;hudTime()}
+function hudTime(){const left=S.phase==='day'?Math.max(0,DAY_LEN-S.t):Math.max(0,NIGHT_SPAWN-S.t);
+  $('phase').textContent=`${S.phase==='day'?'NGÀY':'ĐÊM'} ${S.night} · ${Math.ceil(left)}s · cổng ${Math.max(0,Math.round(S.gate))}/${S.gateMax}${S.hungry?' · đói':''} · KN ${Math.floor(S.exp)}`}
+let bt;function banner(t){const b=$('banner');b.textContent=t;b.classList.add('show');clearTimeout(bt);bt=setTimeout(()=>b.classList.remove('show'),1400)}
+
+// Bàn 7×7 lấy theo chiều ngang (iPhone 15: ô ~52pt); phần còn lại phía trên dành cho cảnh. Ban đêm ẩn dòng tài nguyên nên cảnh cao thêm.
+function layout(){const a=$('app').getBoundingClientRect();cell=Math.floor(Math.min(a.width/COLS,a.height*.5/ROWS));
+  boardEl.style.width=cell*COLS+'px';boardEl.style.height=cell*ROWS+'px';boardEl.style.setProperty('--cell',cell+'px');
+  const s=$('sceneWrap').getBoundingClientRect();dpr=window.devicePixelRatio||1;canvas.width=s.width*dpr;canvas.height=s.height*dpr;render()}
+addEventListener('resize',layout);
+initGrid();layout();hud();requestAnimationFrame(loop);
+</script>
