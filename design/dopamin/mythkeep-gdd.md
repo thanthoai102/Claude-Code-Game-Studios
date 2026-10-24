@@ -44,7 +44,7 @@ Người chơi là vị thần bảo hộ một ngôi làng. Màn hình dọc ch
 - Bốn màu nguyên tố (đỏ Lửa, xanh lá Khí, xanh dương Nước, vàng Đất) phải đậm và tách biệt rõ, kể cả với người mù màu. Mỗi ô có thêm biểu tượng riêng, không chỉ dựa vào màu.
 - Phép và hiệu ứng nổ, cột sáng, chữ CRIT: phóng đại, nhiều màu, đúng chất "dopamine".
 - Quái: dễ thương pha chút đáng sợ, không máu me (hợp cả Mỹ và Nhật, độ tuổi rộng).
-- Artist đề xuất 2–3 hướng cụ thể trong khuôn khổ trên (ví dụ chibi tỉ lệ đầu to, hay cách điệu kiểu tranh phẳng). Anh chọn hướng cuối cùng.
+- **Hướng đã chọn (2026-10-24): B "Folk Tale Comic"** (truyện tranh dân gian): màu ấm, nét vẽ tay viền đen 3px, nhân vật tỉ lệ 3 đầu, màu phẳng + bóng 2 tông, làng pastel nắng vàng. Màu ô: Lửa #E53935, Khí #43A047, Nước #1E88E5, Đất #F9A825; hình ô vuông / thoi / tròn / lục giác. Chi tiết: design/dopamin/mythkeep-art-directions.md (hướng B).
 
 ## 3. Luật chi tiết
 
@@ -158,14 +158,22 @@ Cần đủ pháp sư cho cả hai màu ở cổng, nếu thiếu thì bàn vẫ
 - **Huyền thoại:** đánh **mỗi lần ăn ô bất kỳ màu nào**, sát thương = tổng nguyên tố ăn được × sức × 2 (luôn khắc chế), bắn vào quái gần cổng nhất.
 - **Khắc chế (vòng tròn):** 💧 > 🔥 > 🌪️ > 🪨 > 💧. Đánh hệ mình khắc ×2, hệ khắc mình ×0,5, cặp đối diện ×1.
 - **Cấp:** lên cấp L → L+1 tốn 8L 💠. Cấp tối đa = 5 + 5 × tiềm năng (5 → 30).
-- **Tiềm năng (tối đa 5):** bậc P tốn **4P thẻ trùng của chính pháp sư đó + 50P KN** (bậc 1–5: 4/8/12/16/20 thẻ, 50/100/150/200/250 KN; tổng 60 thẻ + 750 KN). Mỗi bậc +20% sức và mở thêm 5 cấp.
+- **Tiềm năng (tối đa 5):** bậc P tốn **32P thẻ trùng của chính pháp sư đó + 50P KN** (bậc 1–5: 32/64/96/128/160 thẻ, 50/100/150/200/250 KN; tổng 480 thẻ + 750 KN). Số thẻ tăng ×8 (24/10) cùng tỷ lệ với giá kim cương, vì kim cương kiếm được nhanh hơn ước tính cũ (mục 3.10). Mỗi bậc +20% sức và mở thêm 5 cấp.
 - **Nâng phẩm chất ⭐:** khi tiềm năng = 5, nâng **1 lần** lên bậc kế (Thường → Tinh anh → Anh hùng → Sử thi → Huyền thoại), miễn phí. Giữ nguyên cấp và tiềm năng, chỉ đổi hệ số phẩm chất. **Pháp sư đã nâng và pháp sư gốc cùng phẩm chất có sức như nhau.** Sử thi nâng lên Huyền thoại có hệ số ×2,5 nhưng vẫn **một nguyên tố**. Hermes không nâng.
 - **Chưa có pháp sư ở bệ màu đó:** ghép màu đó không ra đòn.
 
 ### 3.8 Quán rượu (quay thẻ)
 - 1 lượt = **1 💎**, ra 1 thẻ. Có nút quay 10 (10 💎). Thẻ của pháp sư chưa có: dùng 1 thẻ để triệu hồi. Thẻ trùng dùng cho tiềm năng.
-- **Tỷ lệ công bố trong game (bản 13 pháp sư):** Thường 90% · Anh hùng 8,99% · Anh hùng sử thi 1% · Huyền thoại 0,01%. Trong mỗi phẩm chất, chia đều cho các pháp sư thuộc phẩm chất đó.
-- **Bảo hiểm:** chắc chắn có Sử thi ở lượt thứ 100. Bộ đếm về 0 khi ra Sử thi hoặc Huyền thoại, giữ qua các ngày. Hiện số lượt còn lại trên màn hình quán.
+- **Hai khung quay (anh chốt 2026-10-24), tỷ lệ công bố trong game:**
+
+| Khung | Thường | Anh hùng | Sử thi | Huyền thoại | Điểm Sao |
+|---|---|---|---|---|---|
+| Giờ thường | 88,9% | 10% | 1% | 0,1% | không |
+| **Khung đặc biệt** (2 tiếng mỗi ngày) | 94,89% | 5% | 0,1% | 0,01% | +1 mỗi lượt |
+
+- **Khung đặc biệt:** mỗi ngày có 2 tiếng cố định (giờ máy chủ, hiện đồng hồ đếm ngược ở quán). Quay trong khung này được 1 điểm Sao mỗi lượt. Đổi điểm: **20 điểm = 1 Anh hùng, 1.000 điểm = 1 Sử thi, 10.000 điểm = 1 Huyền thoại** (người chơi tự chọn pháp sư trong phẩm chất đó). Điểm không mất, không hết hạn.
+- Trong mỗi phẩm chất, chia đều cho các pháp sư thuộc phẩm chất đó.
+- **Bảo hiểm (chỉ giờ thường):** chắc chắn có Sử thi ở lượt thứ 100. Bộ đếm về 0 khi ra Sử thi hoặc Huyền thoại, giữ qua các ngày. Hiện số lượt còn lại trên màn hình quán.
 - Khi có đủ 29 pháp sư: Thường 60 · Tinh anh 30 · Anh hùng 8,99 · Sử thi 1 · Huyền thoại 0,01.
 - **Sự kiện tuần:** mỗi tuần một Huyền thoại "ghé quán" (hiện chỉ có Hermes). Tỷ lệ 0,01% ra Huyền thoại đang ghé.
 - Kết quả quay **phải do máy chủ quyết định** (có tiền thật).
@@ -189,25 +197,26 @@ Cần đủ pháp sư cho cả hai màu ở cổng, nếu thiếu thì bàn vẫ
 
 ### 3.10 Cổng về 0
 Trận dừng, hiện màn hình:
-1. **5 💎: hồi 50% máu cổng** và đánh tiếp ngay (quái trên sân giữ nguyên).
-2. **Xem video +4 💎** (tính vào giới hạn 10 video/ngày). Thẻ vàng: nhận ngay, không xem. Thẻ bạc: dùng vé nếu còn.
+1. **40 💎: hồi 50% máu cổng** và đánh tiếp ngay (quái trên sân giữ nguyên). 40 💎 ≈ số kim cương người chơi trung bình nhận trong 10 phút (mô phỏng 2026-10-24: 3 lần đổi mỗi 2 giây, người chơi thấy khoảng 30% nước ghép 5 → ~42 💎/10 phút; chơi bừa ~23, chơi giỏi ~67).
+2. **Xem video +32 💎** (tính vào giới hạn 10 video/ngày). Thẻ vàng: nhận ngay, không xem. Thẻ bạc: dùng vé nếu còn.
 3. **Chịu thua:** **mất hết tài nguyên trong kho** (🥩 🪵 💠 🪙). **Không mất:** 💎, pháp sư, thẻ, KN, công trình, dân, sản lượng ngoại tuyến chưa thu. Sau đó chơi lại đêm đó với cổng 50% máu, độ mạnh quái giữ nguyên.
 
-Ban ngày cũng có nút **5 💎 hồi 50% máu cổng** (không vượt máu tối đa).
+Ban ngày cũng có nút **40 💎 hồi 50% máu cổng** (không vượt máu tối đa).
 
 ### 3.11 Sách phép
 - 47 trang: 17 phép cấp 1 (mỗi nguyên tố: Tia, Quả cầu, Cột, Ngũ lôi; cộng Bàn tay thần) và 30 phép cấp 2.
 - Trang mở khoá **lần đầu phép được dùng trong trận đêm**, có thông báo "📖 Mở khoá: …".
 - Mỗi trang ghi: cách ghép, công thức sát thương, hiệu ứng, số lần dùng, đòn mạnh nhất.
+- **Thưởng mở khoá:** mỗi phép mở lần đầu +**20 💎** (47 trang = 940 💎).
 
 ### 3.12 Kiếm tiền
 
 | Sản phẩm | Giá | Nội dung |
 |---|---|---|
-| Video có thưởng | Miễn phí | +4 💎 mỗi video, **tối đa 10 video/ngày** |
+| Video có thưởng | Miễn phí | +32 💎 mỗi video, **tối đa 10 video/ngày** |
 | Thẻ bạc (thuê bao tháng) | 2,99 USD | Kho ngoại tuyến 6 giờ; **10 vé miễn video mỗi tháng**, vé chưa dùng tích lại |
 | Thẻ vàng (thuê bao tháng) | 4,99 USD | Kho ngoại tuyến 10 giờ; **miễn mọi video** (nhận thưởng ngay; vẫn tính giới hạn 10/ngày) |
-| Gói kim cương | Theo bậc giá App Store | Dùng quay thẻ, hồi cổng |
+| Gói kim cương | Theo bậc giá App Store, số 💎 mỗi gói ×8 so với kế hoạch cũ | Dùng quay thẻ, hồi cổng |
 | Gói khởi đầu, skin (sau P0) | – | – |
 
 Kim cương miễn phí chỉ từ: ghép 5 ban ngày (3.3) và video. Kim cương không bao giờ mất.
@@ -234,7 +243,7 @@ Kim cương miễn phí chỉ từ: ghép 5 ban ngày (3.3) và video. Kim cươ
 | Sức pháp sư | `P = cấp × M[phẩm chất] × (1 + 0,2 × tiềm năng) × (Đói ? 0,75 : 1)` | M = 1 / 1,25 / 1,6 / 2 / 2,5 |
 | Cấp tối đa | `5 + 5 × tiềm năng` | |
 | Giá lên cấp | `8 × L` 💠 | L = cấp hiện tại |
-| Giá tiềm năng bậc P | `4P` thẻ + `50P` KN | P = 1..5 |
+| Giá tiềm năng bậc P | `32P` thẻ + `50P` KN | P = 1..5 |
 | Đòn cấp 1 | `D = n × P × K(c, e)` (Chữ thập ×1,5) | n = tổng nguyên tố màu c ăn được trong lượt; K = 2 / 1 / 0,5 |
 | Đòn Huyền thoại | `D = n_tất_cả × P × 2` | |
 | Ngũ lôi (🌈) | mỗi tia `n × P × K` | 5 tia |
@@ -304,7 +313,7 @@ Máy chủ: thời gian ngoại tuyến, quay thẻ, IAP, giới hạn video, l�
 | | Tỷ lệ sói to | 20% | 10–35% |
 | | Tăng độ mạnh | ×1,05, ngưỡng 30% | 1,03–1,08; 20–40% |
 | Cổng | Máu đầu, nâng cổng | 10, +2 với 12 🪵 | |
-| | Hồi cổng | 5 💎 = 50% | |
+| | Hồi cổng | 40 💎 = 50% | ≈ 💎 trung bình 10 phút |
 | Kinh tế | Giá công trình | 10 × 1,6^L 🪵 + 5 × 1,6^L 🪙 | hệ số 1,4–1,8 |
 | | Thuê dân | 8 × 1,5^k 🪙 | 1,3–1,8 |
 | | Tự sản xuất | 1 mỗi dân mỗi 15 giây | 10–30 giây |
@@ -313,15 +322,17 @@ Máy chủ: thời gian ngoại tuyến, quay thẻ, IAP, giới hạn video, l�
 | | Đói | ×0,75 | |
 | Pháp sư | Hệ số phẩm chất | 1 / 1,25 / 1,6 / 2 / 2,5 | |
 | | Giá cấp | 8L 💠 | |
-| | Tiềm năng | 4P thẻ + 50P KN, tối đa 5 | |
+| | Tiềm năng | 32P thẻ + 50P KN, tối đa 5 | |
 | | KN mỗi con | 1 / 3 / 10, 🌈 thừa 5 | |
 | Đòn | Chí mạng Chữ thập | ×1,5 | |
 | | Ngũ lôi | 5 tia | |
 | | Hệ số phép cấp 2 | 2 × (1 / 1,25 / 1,5 / 1,75 / 2) | |
 | Kiếm tiền | Quay | 1 💎/lượt | |
-| | Tỷ lệ (bản 13) | 90 / 8,99 / 1 / 0,01 | công bố |
+| | Tỷ lệ giờ thường | 88,9 / 10 / 1 / 0,1 | công bố |
+| | Tỷ lệ khung đặc biệt | 94,89 / 5 / 0,1 / 0,01, +1 điểm | đổi 20 / 1.000 / 10.000 |
+| | Thưởng mở phép | 20 💎 | |
 | | Bảo hiểm Sử thi | lượt 100 | |
-| | Video | +4 💎, 10/ngày | |
+| | Video | +32 💎, 10/ngày | |
 | | Thẻ bạc / vàng | 2,99 / 4,99 USD | |
 
 ## 8. Tiêu chí nghiệm thu
@@ -333,10 +344,10 @@ Máy chủ: thời gian ngoại tuyến, quay thẻ, IAP, giới hạn video, l�
 4. Công trình có k dân cộng đúng k tài nguyên mỗi 15 giây; ngoại tuyến không vượt 3/6/10 giờ.
 5. Giá nâng cấp và thuê dân khớp công thức mục 4 ở bậc 1, 2, 3, 5, 8, 10 (bảng trong concept mục 6).
 6. Đêm thắng với cổng mất 29% thì độ mạnh ×1,05 (máu và sát thương); mất 30% thì không đổi.
-7. Cổng về 0: có 3 lựa chọn; trả 5 💎 thì cổng = 50% và quái giữ nguyên; chịu thua thì 4 tài nguyên về 0, 💎/pháp sư/thẻ/KN không đổi.
-8. Video tăng 4 💎; lần thứ 11 trong ngày bị chặn.
+7. Cổng về 0: có 3 lựa chọn; trả 40 💎 thì cổng = 50% và quái giữ nguyên; chịu thua thì 4 tài nguyên về 0, 💎/pháp sư/thẻ/KN không đổi.
+8. Video tăng 32 💎; lần thứ 11 trong ngày bị chặn.
 9. Mô phỏng 1.000.000 lượt quay: tỷ lệ sai lệch < 0,1 điểm % so với công bố; không có chuỗi nào quá 100 lượt không ra Sử thi.
-10. Lên tiềm năng P trừ đúng 4P thẻ và 50P KN; không đủ một trong hai thì nút tắt.
+10. Lên tiềm năng P trừ đúng 32P thẻ và 50P KN; không đủ một trong hai thì nút tắt.
 11. Nâng phẩm chất chỉ khi tiềm năng 5, chỉ 1 lần; sức sau khi nâng bằng pháp sư gốc cùng phẩm chất, cùng cấp, cùng tiềm năng.
 12. Huyền thoại đặt được ở mọi bệ; khi ở bệ màu X, ghép màu X không gọi đòn riêng màu X.
 13. Đủ 30 phép cấp 2 và 17 phép cấp 1 mở được trang sách khi dùng lần đầu.
@@ -346,7 +357,7 @@ Máy chủ: thời gian ngoại tuyến, quay thẻ, IAP, giới hạn video, l�
 - 30 FPS ổn định trên iPhone 11; 60 FPS trên iPhone 13 trở lên.
 - Tỷ lệ thắng đêm 1–3 ≥ 80% với người mới.
 - Ít nhất 70% người chơi thử nói họ thấy rõ đòn của pháp sư nào khi ghép màu nào.
-- Đo: % bỏ game ngay sau lần mất kho đầu; % xem video; % trả 5 💎 hồi cổng; độ mạnh quái sau 10 đêm.
+- Đo: % bỏ game ngay sau lần mất kho đầu; % xem video; % trả 40 💎 hồi cổng; độ mạnh quái sau 10 đêm.
 
 ## 9. Phạm vi đề xuất cho P0 (CTO quyết định cuối)
 
@@ -357,15 +368,15 @@ Máy chủ: thời gian ngoại tuyến, quay thẻ, IAP, giới hạn video, l�
 | Quả cầu, Chữ thập, Cầu vồng, Bàn tay thần | Phép thần, thanh Lòng tin (concept mục 5, chưa chốt) |
 | 6 phép cấp 2 hình "Vùng" trước, sau đó đủ 30 | Thời đại, kỳ quan, sự kiện tuần |
 | Quay thẻ chạy trên máy, video giả lập | Bang hội, bảng xếp hạng |
-| Sách phép, độ khó theo phong độ, cổng vỡ mất kho | Đổi điểm quay thẻ (chưa chốt) |
+| Sách phép, độ khó theo phong độ, cổng vỡ mất kho, khung quay đặc biệt + đổi điểm | |
 | 10 đêm chơi được, phân tích cơ bản | |
 
 **Bản chơi thử trình duyệt** đã có hầu hết luật trên (trừ máy chủ, ngoại tuyến, thẻ tháng): dùng để đối chiếu hành vi khi làm bản engine.
 
 ## 10. Câu hỏi còn mở
-1. Giới hạn số ô 💎 ban ngày mỗi ngày thật (đề xuất 10 ô)? Hiện khoảng 20–60 💎 miễn phí mỗi 20 phút chơi.
-2. Đổi điểm quay thẻ (đề xuất 300 lượt đổi 1 Sử thi tuỳ chọn)?
-3. Thưởng khi mở hết một nhóm trang sách phép là gì?
+1. ~~Giới hạn ô 💎~~ Đã xử lý 2026-10-24 bằng cách nâng giá (hồi cổng 40 💎, video 32 💎, thẻ tiềm năng ×8), không giới hạn.
+2. ~~Đổi điểm quay thẻ~~ Đã chốt: khung đặc biệt 2 tiếng, đổi 20 / 1.000 / 10.000 (mục 3.8).
+3. ~~Thưởng sách phép~~ Đã chốt: 20 💎 mỗi phép mở lần đầu (mục 3.11).
 4. Thời đại, kỳ quan, phép thần (Lòng tin) có vào bản phát hành đầu không?
 5. Engine (Unity hay Godot) và cách làm máy chủ: CTO đề xuất.
-6. Phong cách hình ảnh đã chốt là hoạt hình / cách điệu (mục 2b); hướng cụ thể anh chọn sau khi Artist đưa 2–3 phương án.
+6. ~~Phong cách hình ảnh~~ Đã chốt hướng B "Folk Tale Comic" (mục 2b).

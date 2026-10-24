@@ -79,7 +79,7 @@ body.night .res{display:none}
     <canvas id="scene"></canvas>
     <div id="dayBtns">
       <button id="btnGate" type="button">🪵 Cổng (12)</button>
-      <button id="btnHeal" type="button">🩹 5💎</button><button id="btnAd" type="button">📺 +4💎</button>
+      <button id="btnHeal" type="button">🩹 40💎</button><button id="btnAd" type="button">📺 +32💎</button>
       <button id="btnNight" type="button">🌙 Đêm</button>
     </div>
     <div id="banner"></div>
@@ -98,7 +98,7 @@ body.night .res{display:none}
   <h2>Mythkeep: Match &amp; Defend</h2>
   <p><b>Ban ngày:</b> vuốt đổi ô để ghép 3. Mỗi ô cho đúng số +N ghi trên ô. Chạm công trình để nâng cấp và thuê dân (mỗi dân +1 cho ô mới rơi). Chạm pháp sư ở cổng để nâng cấp hoặc đổi người. Quán rượu: 1 💎 một lượt quay thẻ.</p>
   <p><b>Ban đêm:</b> ghép ra nguyên tố, pháp sư cùng màu bắn quái. Ghép 4 = Quả cầu, ghép L/T = Chữ thập (cột từ trời, chí mạng 150%), ghép 5 = 🌈. Chạm 🌈 để ăn hết ô cùng màu với nó. Đổi 2 ô đặc biệt <b>khác màu</b> (cả 🌈, mang màu của lần ghép 5 tạo ra nó) = phép cấp 2. Khắc: 💧→🔥→🌪️→🪨→💧.</p>
-  <p>Bản thử tặng sẵn 10 💎 để thử quán rượu.</p>
+  <p>Bản thử tặng sẵn 80 💎 để thử quán rượu.</p>
   <label class="row" style="justify-content:center"><input type="checkbox" id="slow"> Chế độ chậm (quái đi 7 giây)</label>
   <button id="btnStart" type="button">Bắt đầu</button>
 </div></div>
@@ -130,7 +130,7 @@ const SHAPE={oo:['Vùng','Quả cầu với Quả cầu','nổ 5×5 trên bàn; 
   rc:['Thiên phạt','Cầu vồng với Chữ thập','mọi ô cùng màu Chữ thập hoá Chữ thập và nổ; 5 cột giáng xuống 5 quái gần nhất',2]};
 const pairKey=(a,b)=>a<b?`${a}-${b}`:`${b}-${a}`;
 
-const S={phase:'day',night:1,t:0,res:[0,0,0,18],gems:10,bld:[0,0,0,0],workers:[0,0,0,0],
+const S={phase:'day',night:1,t:0,res:[0,0,0,18],gems:80,stars:0,spOn:false,bld:[0,0,0,0],workers:[0,0,0,0],
   cards:Array(13).fill(0),owned:{},gateW:[0,3,6,9],exp:0,pity:0,book:{},power:1,gateStart:10,
   gate:10,gateMax:10,hungry:false,mons:[],fx:[],pops:[],nextSpawn:0,busy:false,slow:false,trans:null,paused:true,shake:0,
   bossEl:Math.floor(Math.random()*4),bossOut:false};
@@ -240,7 +240,7 @@ for(const pk of Object.keys(PAIR))for(const sh of Object.keys(SHAPE)){const [a,b
     dmg:`Tổng nguyên tố × sức trung bình 2 pháp sư × 2 (cấp 2) × ${String(SHAPE[sh][3]).replace('.',',')} (hình dạng) × khắc chế (lấy hệ có lợi hơn của ${NIGHT[a]} và ${NIGHT[b]}).`,
     fx:`${SHAPE[sh][2]}. Thêm: ${PAIR[pk][1]}.`})}
 function unlock(k,dmg){const page=BOOK.find(b=>b.k===k);if(!page)return;const e=S.book[k];
-  if(!e){S.book[k]={uses:1,best:dmg};banner(`📖 Mở khoá: ${page.name}`);hud()}else{e.uses++;e.best=Math.max(e.best,dmg)}}
+  if(!e){S.book[k]={uses:1,best:dmg};S.gems+=20;banner(`📖 Mở khoá: ${page.name} +20 💎`);hud()}else{e.uses++;e.best=Math.max(e.best,dmg)}}
 
 /* ---------- effects ---------- */
 function apply(counts,events,casc){
@@ -367,7 +367,7 @@ canvas.addEventListener('click',e=>{if(S.phase!=='day'||S.trans||S.paused)return
   for(let i=0;i<4;i++){if(Math.hypot(x-W*SLOTX[i],y-40)<26){openRoster(i);return}}
   for(let i=0;i<5;i++){if(Math.abs(x-W*(.1+.2*i))<W*.09&&Math.abs(y-H*.6)<34){i<4?openBuilding(i):openTavern();return}}});
 $('btnGate').onclick=()=>{if(S.res[1]>=12){S.res[1]-=12;S.gateMax+=2;S.gate=S.gateMax;banner('Cổng chắc hơn');hud()}else banner('Cần 12 🪵')};
-$('btnHeal').onclick=()=>{if(S.gate>=S.gateMax)return banner('Cổng đầy máu');if(S.gems<5)return banner('Cần 5 💎');S.gems-=5;S.gate=Math.min(S.gateMax,S.gate+Math.ceil(S.gateMax/2));banner('Cổng hồi 50%');hud()};
+$('btnHeal').onclick=()=>{if(S.gate>=S.gateMax)return banner('Cổng đầy máu');if(S.gems<40)return banner('Cần 40 💎');S.gems-=40;S.gate=Math.min(S.gateMax,S.gate+Math.ceil(S.gateMax/2));banner('Cổng hồi 50%');hud()};
 $('btnAd').onclick=()=>watchAd();
 $('btnNight').onclick=()=>{if(S.phase==='day'&&!S.trans&&!S.paused)startNight()};
 $('btnBook').onclick=()=>openBook();
@@ -386,26 +386,37 @@ function openBuilding(i){S.openB=i;
   $('bHire').onclick=()=>{if(k<L&&S.res[3]>=hire){S.res[3]-=hire;S.workers[i]++;refresh(()=>openBuilding(i))}else banner('Thiếu vàng')};
 }
 const featured=()=>WIZ[LEGEND];
-// Tỷ lệ công bố (bản 13 pháp sư, chưa có Tinh anh): Thường 90%, Anh hùng 8,99%, Anh hùng sử thi 1% (chắc chắn ở lượt 100), Huyền thoại 0,01%
-function rollRarity(){S.pity++;let x=Math.random()*100;
-  if(x<.01){S.pity=0;return 4}if(x<1.01||S.pity>=100){S.pity=0;return 3}if(x<10)return 2;return 0}
+// Tỷ lệ công bố (chốt 2026-10-24). Giờ thường: Anh hùng 10%, Sử thi 1% (chắc chắn ở lượt 100), Huyền thoại 0,1%.
+// Khung đặc biệt 2 tiếng/ngày (bản thử: 20h–22h giờ máy, hoặc bật nút giả lập): 5% / 0,1% / 0,01%, mỗi lượt +1 điểm Sao.
+const inSpecial=()=>{const h=new Date().getHours();return S.spOn||(h>=20&&h<22)};
+function rollRarity(){let x=Math.random()*100;
+  if(inSpecial()){S.stars++;if(x<.01)return 4;if(x<.11)return 3;if(x<5.11)return 2;return 0}
+  S.pity++;if(x<.1){S.pity=0;return 4}if(x<1.1||S.pity>=100){S.pity=0;return 3}if(x<11.1)return 2;return 0}
+const XCH=[[2,20],[3,1000],[4,10000]];
+function exchange(r){const cost=XCH.find(x=>x[0]===r)[1];if(S.stars<cost){banner(`Cần ${cost} điểm Sao`);return []}
+  S.stars-=cost;const pool=r===4?[featured()]:WIZ.filter(w=>w.r===r&&w.el<4);const w=pool[rnd(pool.length)];S.cards[w.id]++;return [w]}
 function pull(n){if(S.gems<n){banner(`Cần ${n} 💎`);return []}S.gems-=n;const got=[];
   for(let i=0;i<n;i++){let r=rollRarity();const pool=r===4?[featured()]:WIZ.filter(w=>w.r===r&&w.el<4);const w=pool[rnd(pool.length)];S.cards[w.id]++;got.push(w)}
   return got}
 function openTavern(last=[]){
   const f=featured(),wk=Math.floor((S.night-1)/7);
   openPanel(`<h2>Quán rượu</h2><p><b>Sự kiện tuần (đêm ${wk*7+1}–${wk*7+7}):</b> ✨ <b style="color:${RAR[4].col}">${f.name}</b> ghé quán. Mang cả 4 nguyên tố, khắc mọi nguyên tố, đánh mỗi khi ăn bất kỳ ô nào. Đứng được ở bất kỳ bệ nào trong 4 bệ.</p>
-   <p>1 💎 một lượt, ra 1 thẻ pháp sư. <b>Tỷ lệ công bố:</b> Thường 90%, Anh hùng 8,99%, Anh hùng sử thi 1%, Huyền thoại 0,01%. Chắc chắn có Anh hùng sử thi ở lượt thứ 100 (còn ${100-S.pity} lượt). Đang có ${S.gems} 💎.</p>
+   <p>1 💎 một lượt, ra 1 thẻ pháp sư. Đang có ${S.gems} 💎, ${S.stars} điểm Sao.</p>
+   <p>${inSpecial()?`<b>⭐ Đang trong khung đặc biệt.</b> Tỷ lệ: Anh hùng 5%, Sử thi 0,1%, Huyền thoại 0,01%. Mỗi lượt +1 điểm Sao.`:`<b>Giờ thường.</b> Tỷ lệ: Anh hùng 10%, Sử thi 1%, Huyền thoại 0,1%. Chắc chắn có Sử thi ở lượt thứ 100 (còn ${100-S.pity} lượt). Khung đặc biệt: 20h–22h.`}</p>
    <div class="row"><button id="t1" type="button">Quay 1 (1💎)</button><button id="t10" type="button">Quay 10 (10💎)</button></div>
+   <div class="row"><button id="x2" type="button" ${S.stars<20?'disabled':''}>Đổi Anh hùng (20⭐)</button><button id="x3" type="button" ${S.stars<1000?'disabled':''}>Đổi Sử thi (1.000⭐)</button><button id="x4" type="button" ${S.stars<10000?'disabled':''}>Đổi Huyền thoại (10.000⭐)</button></div>
+   <div class="row"><button id="spT" type="button">${S.spOn?'Tắt':'Bật'} giả lập khung đặc biệt</button></div>
    ${last.length?`<div class="cards">${last.map(w=>`<span class="cardmini" style="--r:${RAR[w.r].col};border-color:${RAR[w.r].col}">${NIGHT[w.el]} ${w.name}<br><small>${RAR[w.r].n}</small></span>`).join('')}</div><p>Thẻ đã vào túi. Chạm pháp sư ở cổng để triệu hồi hoặc tăng tiềm năng.</p>`:''}`,true);
   $('t1').onclick=()=>{const g=pull(1);hud();refresh(()=>openTavern(g))};
   $('t10').onclick=()=>{const g=pull(10);hud();refresh(()=>openTavern(g))};
+  [2,3,4].forEach(r=>$('x'+r).onclick=()=>{const g=exchange(r);refresh(()=>openTavern(g))});
+  $('spT').onclick=()=>{S.spOn=!S.spOn;refresh(()=>openTavern())};
 }
 function openRoster(el){
   const rows=WIZ.filter(w=>w.el===el||(w.id===LEGEND&&(S.owned[w.id]||S.cards[w.id]))).map(w=>{const o=S.owned[w.id],cards=S.cards[w.id],wr=o&&o.r!=null?o.r:w.r,rc=RAR[wr].col;
     if(!o)return `<div class="wz" style="--r:${rc}"><div><b>${w.name}</b> <small>${RAR[w.r].n} · chưa có · thẻ ${cards}</small></div>
       <div class="row"><button type="button" data-a="sum" data-id="${w.id}" ${cards<1?'disabled':''}>Triệu hồi (1 thẻ)</button></div></div>`;
-    const cap=lvCap(o),costLv=8*o.lv,needPot=4*(o.pot+1),needExp=50*(o.pot+1),atGate=S.gateW[el]===w.id;
+    const cap=lvCap(o),costLv=8*o.lv,needPot=32*(o.pot+1),needExp=50*(o.pot+1),atGate=S.gateW[el]===w.id;
     return `<div class="wz" style="--r:${rc}"><div><b>${w.name}</b> <small>${o.asc?'⭐ ':''}${RAR[wr].n} ×${RAR[wr].m} · cấp ${o.lv}/${cap} · tiềm năng ${o.pot}/5 · thẻ ${cards}${atGate?' · <b>đang ở cổng</b>':''}</small></div>
       <div class="row"><button type="button" data-a="lv" data-id="${w.id}" ${o.lv>=cap?'disabled':''}>Lên cấp (${costLv}💠)</button>
       <button type="button" data-a="pot" data-id="${w.id}" ${o.pot>=5||cards<needPot||S.exp<needExp?'disabled':''}>Tiềm năng (${needPot} thẻ + ${needExp} KN)</button>
@@ -440,14 +451,14 @@ function dawn(){
   banner((S.hungry?'Sống sót! Thiếu thịt: pháp sư đói':`Đêm ${S.night}: sống sót! Ăn ${eaters} 🥩`)+(up?` · cổng mất ${Math.round(lost*100)}% < 30%: quái +5% sát thương, +5% máu`:''));S.night++;
   flipTiles();$('dayBtns').hidden=false;hud();
 }
-// Cổng về 0: trả 5💎 để hồi 50% máu và đánh tiếp; chịu thua thì mất hết tài nguyên trong kho (kim cương không bao giờ mất).
+// Cổng về 0: trả 40💎 để hồi 50% máu và đánh tiếp; chịu thua thì mất hết tài nguyên trong kho (kim cương không bao giờ mất).
 function lose(){
   openPanel(`<h2>Cổng vỡ!</h2><p>Hồi 50% máu cổng để đánh tiếp đêm ${S.night}? Nếu chịu thua, <b>mất hết tài nguyên trong kho</b> (🥩 🪵 💠 🪙). Kim cương, pháp sư và thẻ không mất.</p><p>Đang có ${S.gems} 💎.</p>
-   <div class="row"><button id="revive" type="button" ${S.gems<5?'disabled':''}>🩹 5💎: hồi 50% cổng</button><button id="adL" type="button">📺 Xem video +4💎</button></div><button id="giveUp" type="button">Chịu thua</button>`);
-  $('revive').onclick=()=>{S.gems-=5;S.gate=Math.ceil(S.gateMax/2);closePanel();banner('Cổng hồi 50%')};
+   <div class="row"><button id="revive" type="button" ${S.gems<40?'disabled':''}>🩹 40💎: hồi 50% cổng</button><button id="adL" type="button">📺 Xem video +32💎</button></div><button id="giveUp" type="button">Chịu thua</button>`);
+  $('revive').onclick=()=>{S.gems-=40;S.gate=Math.ceil(S.gateMax/2);closePanel();banner('Cổng hồi 50%')};
   $('adL').onclick=()=>{watchAd();refresh(lose)};
   $('giveUp').onclick=()=>{S.res=[0,0,0,0];S.gate=Math.ceil(S.gateMax/2);S.gateStart=S.gate;S.mons=[];S.bossOut=false;S.t=0;S.nextSpawn=.6;closePanel();banner(`Mất hết kho. Thử lại đêm ${S.night}`)}}
-function watchAd(){S.gems+=4;bump('rg');hud();banner('📺 +4 💎')} // bản chơi thử: giả lập xem xong video
+function watchAd(){S.gems+=32;bump('rg');hud();banner('📺 +32 💎')} // bản chơi thử: giả lập xem xong video
 
 /* ---------- loop ---------- */
 let last=performance.now();
