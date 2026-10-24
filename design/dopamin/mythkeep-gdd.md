@@ -166,7 +166,7 @@ Cần đủ pháp sư cho cả hai màu ở cổng, nếu thiếu thì bàn vẫ
 - **Khắc chế (vòng tròn):** 💧 > 🔥 > 🌪️ > 🪨 > 💧. Đánh hệ mình khắc ×2, hệ khắc mình ×0,5, cặp đối diện ×1.
 - **Cấp:** lên cấp L → L+1 tốn 8L 💠. Cấp tối đa = 5 + 5 × tiềm năng (5 → 30).
 - **Tiềm năng (tối đa 5):** bậc P tốn **32P thẻ trùng của chính pháp sư đó + 50P KN** (bậc 1–5: 32/64/96/128/160 thẻ, 50/100/150/200/250 KN; tổng 480 thẻ + 750 KN). Số thẻ tăng ×8 (24/10) cùng tỷ lệ với giá kim cương, vì kim cương kiếm được nhanh hơn ước tính cũ (mục 3.10). Mỗi bậc +20% sức và mở thêm 5 cấp.
-- **Nâng phẩm chất ⭐:** khi tiềm năng = 5, nâng **1 lần** lên bậc kế (Thường → Tinh anh → Anh hùng → Sử thi → Huyền thoại), miễn phí. Giữ nguyên cấp và tiềm năng, chỉ đổi hệ số phẩm chất. **Pháp sư đã nâng và pháp sư gốc cùng phẩm chất có sức như nhau.** Bản 11 pháp sư không có Tinh anh, nên thang nâng là Thường → Anh hùng → Sử thi → Huyền thoại. Nâng phẩm chất có thêm nguyên tố hay không: **chờ anh chốt** (mục 10). Hai Huyền thoại không nâng.
+- **Nâng phẩm chất ⭐:** khi tiềm năng = 5, nâng **1 lần** lên bậc kế (Thường → Tinh anh → Anh hùng → Sử thi → Huyền thoại), miễn phí. Giữ nguyên cấp và tiềm năng, chỉ đổi hệ số phẩm chất. **Pháp sư đã nâng và pháp sư gốc cùng phẩm chất có chỉ số sức như nhau.** Bản 11 pháp sư không có Tinh anh, nên thang nâng là Thường → Anh hùng → Sử thi → Huyền thoại. **Nâng phẩm chất không thêm nguyên tố** (anh chốt 2026-10-24): chỉ đổi hệ số. Vì vậy pháp sư đã nâng có cùng sức (cấp × hệ số × tiềm năng) với pháp sư gốc cùng phẩm chất, nhưng ít nguyên tố hơn nên ăn ít loại ô hơn. Hai Huyền thoại không nâng.
 - **Không có pháp sư nào trên cổng mang nguyên tố X:** ghép màu X không ra đòn thường (Bóng tối vẫn tính các ô đó).
 
 ### 3.8 Quán rượu (quay thẻ)
@@ -388,4 +388,4 @@ Máy chủ: thời gian ngoại tuyến, quay thẻ, IAP, giới hạn video, l�
 4. Thời đại, kỳ quan, phép thần (Lòng tin) có vào bản phát hành đầu không?
 5. Engine (Unity hay Godot) và cách làm máy chủ: CTO đề xuất.
 6. ~~Phong cách hình ảnh~~ Đã chốt hướng B "Folk Tale Comic" (mục 2b).
-7. Nâng phẩm chất (tiềm năng 5) có thêm nguyên tố không? Ví dụ Salamander (1 nguyên tố) lên Anh hùng thì có thêm 1 nguyên tố để bằng Anh hùng gốc (2 nguyên tố), hay giữ 1 nguyên tố và chỉ tăng hệ số?
+7. ~~Nâng phẩm chất có thêm nguyên tố?~~ Đã chốt: không, chỉ tăng hệ số.

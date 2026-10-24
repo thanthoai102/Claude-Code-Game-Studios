@@ -123,6 +123,7 @@ const WIZ=[
 WIZ.forEach(w=>w.el=w.dark?5:w.light?4:w.els[0]);
 const LEGENDS=[9,10];
 COL.push('#ffd23f','#6a3fa0');NIGHT.push('✨','🌑');ELN.push('Ánh sáng','Bóng tối');
+const nextR=r=>r===0?2:r+1; // bản 11 pháp sư không có Tinh anh; nâng phẩm chất chỉ đổi hệ số, không thêm nguyên tố
 const elIcons=w=>w.dark?'🌑':w.els.map(e=>NIGHT[e]).join('');
 const SLOTX=[.1,.3,.7,.9]; // 4 bệ, pháp sư nào cũng đứng được ở bệ nào
 const PAIR={'0-1':['Bão lửa','cháy 3 giây (10%/giây)'],'0-3':['Dung nham','cháy mạnh 3 giây (15%/giây)'],'0-2':['Hơi nước','mù, đứng yên 1 giây'],
@@ -441,14 +442,14 @@ function openRoster(el){
     return `<div class="wz" style="--r:${rc}"><div><b>${elIcons(w)} ${w.name}</b> <small>${o.asc?'⭐ ':''}${RAR[wr].n} ×${RAR[wr].m} · cấp ${o.lv}/${cap} · tiềm năng ${o.pot}/5 · thẻ ${cards}${atGate?' · <b>đang ở cổng</b>':''}</small></div>
       <div class="row"><button type="button" data-a="lv" data-id="${w.id}" ${o.lv>=cap?'disabled':''}>Lên cấp (${costLv}💠)</button>
       <button type="button" data-a="pot" data-id="${w.id}" ${o.pot>=5||cards<needPot||S.exp<needExp?'disabled':''}>Tiềm năng (${needPot} thẻ + ${needExp} KN)</button>
-      ${o.pot>=5&&!o.asc&&wr<4?`<button type="button" data-a="asc" data-id="${w.id}">⭐ Nâng lên ${RAR[wr+1].n}</button>`:''}
+      ${o.pot>=5&&!o.asc&&wr<4?`<button type="button" data-a="asc" data-id="${w.id}">⭐ Nâng lên ${RAR[nextR(wr)].n} (giữ nguyên tố)</button>`:''}
       ${atGate?'':`<button type="button" data-a="gate" data-id="${w.id}">Ra cổng</button>`}</div></div>`}).join('');
   openPanel(`<h2>Bệ ${el+1}</h2><p>Pháp sư nào cũng đứng được ở bệ nào. Hết mỗi lượt (một lần đổi và các lần ăn dây chuyền), pháp sư đánh 1 lần nếu lượt đó có ăn nguyên tố của mình. Bóng tối 🌑 đánh mỗi 1 giây theo tổng nguyên tố ăn được trong giây đó. Sức = cấp × phẩm chất × (1 + 0,2 × tiềm năng). Cấp tối đa = 5 + 5 × tiềm năng. Tiềm năng đủ 5 thì được nâng phẩm chất 1 lần (⭐), giữ nguyên cấp và tiềm năng, nên mạnh đúng bằng pháp sư gốc phẩm chất đó.</p>${rows}`);
   $('panelCard').querySelectorAll('button[data-a]').forEach(btn=>btn.onclick=()=>{const id=+btn.dataset.id,a=btn.dataset.a,o=S.owned[id];
     if(a==='sum'){S.cards[id]--;S.owned[id]={lv:1,pot:0};banner(`Triệu hồi ${WIZ[id].name}`)}
     if(a==='lv'){if(S.res[2]>=8*o.lv){S.res[2]-=8*o.lv;o.lv++}else banner('Thiếu mana')}
     if(a==='pot'){S.cards[id]-=32*(o.pot+1);S.exp-=50*(o.pot+1);o.pot++}
-    if(a==='asc'){o.r=WIZ[id].r+1;o.asc=true;banner(`⭐ ${WIZ[id].name} lên ${RAR[o.r].n}`)}
+    if(a==='asc'){o.r=nextR(WIZ[id].r);o.asc=true;banner(`⭐ ${WIZ[id].name} lên ${RAR[o.r].n}`)}
     if(a==='gate'){const prev=S.gateW.indexOf(id);if(prev>=0)S.gateW[prev]=null;S.gateW[el]=id}
     hud();refresh(()=>openRoster(el))});
 }
