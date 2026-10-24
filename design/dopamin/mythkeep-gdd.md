@@ -19,7 +19,7 @@ Mọi con số trong tài liệu là **giá trị khởi đầu để cân bằn
 
 ## 1. Tổng quan
 
-Người chơi là vị thần bảo hộ một ngôi làng. Màn hình dọc chia đôi: nửa trên là cảnh (làng ban ngày, đồng cỏ ban đêm), nửa dưới là một bàn ghép 3 kích thước 7 × 7. **Ban ngày** (2 phút) ghép ô ra tài nguyên (thịt, gỗ, mana, vàng) để nâng công trình, thuê dân, nâng pháp sư. **Ban đêm** (45 giây) cùng bàn ghép đó lật thành 4 nguyên tố (Lửa, Khí, Nước, Đất). Mỗi lần ghép, pháp sư cùng nguyên tố đứng trên cổng làng, ngay trên bàn ghép, bắn phép vào bầy quái đang tràn xuống. Cổng vỡ thì mất kho tài nguyên. Pháp sư có từ quán rượu (quay thẻ bằng kim cương) và mạnh lên bằng mana, thẻ trùng và kinh nghiệm đánh quái.
+Người chơi là vị thần bảo hộ một ngôi làng. Màn hình dọc chia đôi: nửa trên là cảnh (làng ban ngày, đồng cỏ ban đêm), nửa dưới là một bàn ghép 3 kích thước 7 × 7. **Ban ngày** (2 phút) ghép ô ra tài nguyên (thịt, gỗ, mana, vàng) để nâng công trình, thuê dân, nâng pháp sư. **Ban đêm** (45 giây) cùng bàn ghép đó lật thành 4 nguyên tố (Lửa, Khí, Nước, Đất). Hết mỗi lượt ghép, các pháp sư đứng trên cổng làng (ngay trên bàn ghép) có nguyên tố vừa ăn sẽ bắn phép vào bầy quái đang tràn xuống. Cổng vỡ thì mất kho tài nguyên. Pháp sư có từ quán rượu (quay thẻ bằng kim cương) và mạnh lên bằng mana, thẻ trùng và kinh nghiệm đánh quái.
 
 **Tên game:** Mythkeep (Myth + Keep: giữ thành bằng các pháp sư thần thoại). Tên phụ "Match & Defend" cho người xem App Store hiểu ngay thể loại. Tiếng Nhật: ミスキープ. Trước khi phát hành phải kiểm tra trùng tên trên App Store và nhãn hiệu tại Mỹ, Nhật.
 
@@ -142,25 +142,32 @@ Cần đủ pháp sư cho cả hai màu ở cổng, nếu thiếu thì bàn vẫ
 
 ### 3.7 Pháp sư
 
-**Bản phát hành đầu: 13 pháp sư.** Đủ bộ 29 người để dành cho các bản cập nhật (danh sách trong concept mục 6b).
+**Bản phát hành đầu: 11 pháp sư (anh chốt 2026-10-24 04:53).** Phẩm chất càng cao thì điều khiển càng nhiều nguyên tố. Mỗi nguyên tố có đúng 4 pháp sư (chưa kể Ánh sáng). Cách ghép nguyên tố cho từng người do Claude đề xuất, anh sửa được.
 
-| Nguyên tố | Thường (×1) | Anh hùng (×1,6) | Anh hùng sử thi (×2) |
-|---|---|---|---|
-| 🔥 Lửa | Salamander | Prometheus | Surtr |
-| 🌪️ Khí | Sylph | Raven | Zeus |
-| 💧 Nước | Undine | Ægir | Poseidon |
-| 🪨 Đất | Gnome | Merlin | Gaia |
-| ✨ Huyền thoại (×2,5) | Hermes Trismegistus: mang cả 4 nguyên tố | | |
+| Phẩm chất (hệ số) | Pháp sư | Nguyên tố |
+|---|---|---|
+| Thường (×1) | Salamander · Sylph · Undine · Gnome | 🔥 · 🌪️ · 💧 · 🪨 (mỗi người 1) |
+| Anh hùng (×1,6) | Prometheus | 🔥 🪨 (lò rèn) |
+| | Ægir | 💧 🌪️ (biển bão) |
+| | Merlin | 🌪️ 🪨 (rừng già) |
+| Sử thi (×2) | Zeus | 🌪️ 🔥 💧 (giông sét) |
+| | Gaia | 🪨 💧 🔥 (núi lửa, đại dương) |
+| Huyền thoại (×2,5) | Hermes Trismegistus, **Ánh sáng** | cả 4 nguyên tố |
+| | Morgan le Fay, **Bóng tối** | không nguyên tố |
 
 - **Quy tắc tên:** thần thoại Hy Lạp, Bắc Âu, Châu Âu, và **biểu tượng phổ biến** của thổ dân Mỹ (không dùng đối tượng thờ cúng).
 - **Khởi đầu:** tặng 4 pháp sư Thường (Salamander, Sylph, Undine, Gnome), cấp 1, đứng sẵn ở 4 bệ.
-- **Cổng có 4 bệ**, mỗi bệ một nguyên tố. Bệ nhận pháp sư cùng nguyên tố hoặc **Huyền thoại**. Huyền thoại đứng ở bệ nào thì thay pháp sư của nguyên tố bệ đó: màu đó không có pháp sư riêng (không Quả cầu, Chữ thập, Ngũ lôi riêng), Huyền thoại đánh thay.
-- **Huyền thoại:** đánh **mỗi lần ăn ô bất kỳ màu nào**, sát thương = tổng nguyên tố ăn được × sức × 2 (luôn khắc chế), bắn vào quái gần cổng nhất.
+- **Cổng có 4 bệ, pháp sư nào cũng đứng được ở bệ nào** (bệ không gắn nguyên tố). Mỗi pháp sư chỉ đứng 1 bệ.
+- **Lượt:** một lượt là **một lần đổi ô và mọi lần ăn dây chuyền sau đó, cho tới khi bàn chờ lần đổi tiếp theo**. Chạm 🌈 hoặc 💎 cũng tính là một lượt.
+- **Đòn thường (mọi pháp sư trừ Bóng tối):** hết lượt, pháp sư đánh **1 lần** nếu lượt đó có ăn ít nhất một nguyên tố của mình. Sát thương = tổng số ô thuộc các nguyên tố của mình ăn trong lượt × sức × khắc chế (lấy nguyên tố có lợi nhất trong số nguyên tố vừa ăn với quái mục tiêu), bắn vào quái gần cổng nhất. Ví dụ: lượt ăn 6 🔥 và 3 🪨, Prometheus đánh 1 đòn bằng 9 × sức.
+- **Ánh sáng (Hermes):** đánh như trên với cả 4 nguyên tố, nên lượt nào cũng đánh và luôn chọn được nguyên tố khắc quái nếu lượt đó có ăn.
+- **Bóng tối (Morgan le Fay):** không theo lượt. **Cứ mỗi 1 giây đánh 1 lần**, sát thương = tổng số ô nguyên tố (mọi màu) ăn được trong 1 giây vừa qua × sức, không khắc chế (×1). Giây nào không ăn ô thì không đánh.
+- **Ô đặc biệt và phép cấp 2** (Quả cầu, Chữ thập, Ngũ lôi, phép cấp 2) nổ ngay khi kích hoạt, không chờ hết lượt. Sức dùng cho màu X là sức của **pháp sư mạnh nhất trên cổng có nguyên tố X**.
 - **Khắc chế (vòng tròn):** 💧 > 🔥 > 🌪️ > 🪨 > 💧. Đánh hệ mình khắc ×2, hệ khắc mình ×0,5, cặp đối diện ×1.
 - **Cấp:** lên cấp L → L+1 tốn 8L 💠. Cấp tối đa = 5 + 5 × tiềm năng (5 → 30).
 - **Tiềm năng (tối đa 5):** bậc P tốn **32P thẻ trùng của chính pháp sư đó + 50P KN** (bậc 1–5: 32/64/96/128/160 thẻ, 50/100/150/200/250 KN; tổng 480 thẻ + 750 KN). Số thẻ tăng ×8 (24/10) cùng tỷ lệ với giá kim cương, vì kim cương kiếm được nhanh hơn ước tính cũ (mục 3.10). Mỗi bậc +20% sức và mở thêm 5 cấp.
-- **Nâng phẩm chất ⭐:** khi tiềm năng = 5, nâng **1 lần** lên bậc kế (Thường → Tinh anh → Anh hùng → Sử thi → Huyền thoại), miễn phí. Giữ nguyên cấp và tiềm năng, chỉ đổi hệ số phẩm chất. **Pháp sư đã nâng và pháp sư gốc cùng phẩm chất có sức như nhau.** Sử thi nâng lên Huyền thoại có hệ số ×2,5 nhưng vẫn **một nguyên tố**. Hermes không nâng.
-- **Chưa có pháp sư ở bệ màu đó:** ghép màu đó không ra đòn.
+- **Nâng phẩm chất ⭐:** khi tiềm năng = 5, nâng **1 lần** lên bậc kế (Thường → Tinh anh → Anh hùng → Sử thi → Huyền thoại), miễn phí. Giữ nguyên cấp và tiềm năng, chỉ đổi hệ số phẩm chất. **Pháp sư đã nâng và pháp sư gốc cùng phẩm chất có sức như nhau.** Bản 11 pháp sư không có Tinh anh, nên thang nâng là Thường → Anh hùng → Sử thi → Huyền thoại. Nâng phẩm chất có thêm nguyên tố hay không: **chờ anh chốt** (mục 10). Hai Huyền thoại không nâng.
+- **Không có pháp sư nào trên cổng mang nguyên tố X:** ghép màu X không ra đòn thường (Bóng tối vẫn tính các ô đó).
 
 ### 3.8 Quán rượu (quay thẻ)
 - 1 lượt = **1 💎**, ra 1 thẻ. Có nút quay 10 (10 💎). Thẻ của pháp sư chưa có: dùng 1 thẻ để triệu hồi. Thẻ trùng dùng cho tiềm năng.
@@ -168,14 +175,13 @@ Cần đủ pháp sư cho cả hai màu ở cổng, nếu thiếu thì bàn vẫ
 
 | Khung | Thường | Anh hùng | Sử thi | Huyền thoại | Điểm Sao |
 |---|---|---|---|---|---|
-| Giờ thường | 88,9% | 10% | 1% | 0,1% | không |
-| **Khung đặc biệt** (2 tiếng mỗi ngày) | 94,89% | 5% | 0,1% | 0,01% | +1 mỗi lượt |
+| Giờ thường | 89,45% | 10% | 0,5% | 0,05% | không |
+| **Giờ vàng, đã tham gia** (2 tiếng mỗi ngày) | 94,89% | 5% | 0,1% | 0,01% | +1 mỗi lượt |
 
-- **Khung đặc biệt:** mỗi ngày có 2 tiếng cố định (giờ máy chủ, hiện đồng hồ đếm ngược ở quán). Quay trong khung này được 1 điểm Sao mỗi lượt. Đổi điểm: **20 điểm = 1 Anh hùng, 1.000 điểm = 1 Sử thi, 10.000 điểm = 1 Huyền thoại** (người chơi tự chọn pháp sư trong phẩm chất đó). Điểm không mất, không hết hạn.
+- **Giờ vàng:** mỗi ngày có 2 tiếng cố định (giờ máy chủ, hiện đồng hồ đếm ngược ở quán). **Người chơi tự chọn tham gia hay không** (nút bật/tắt ở quán, đổi được bất cứ lúc nào trong giờ vàng). Không tham gia thì vẫn quay tỷ lệ giờ thường. Tham gia thì mỗi lượt được 1 điểm Sao. Đổi điểm: **20 điểm = 1 Anh hùng, 1.000 điểm = 1 Sử thi, 10.000 điểm = 1 Huyền thoại** (người chơi tự chọn pháp sư trong phẩm chất đó). Điểm không mất, không hết hạn.
 - Trong mỗi phẩm chất, chia đều cho các pháp sư thuộc phẩm chất đó.
-- **Bảo hiểm (chỉ giờ thường):** chắc chắn có Sử thi ở lượt thứ 100. Bộ đếm về 0 khi ra Sử thi hoặc Huyền thoại, giữ qua các ngày. Hiện số lượt còn lại trên màn hình quán.
-- Khi có đủ 29 pháp sư: Thường 60 · Tinh anh 30 · Anh hùng 8,99 · Sử thi 1 · Huyền thoại 0,01.
-- **Sự kiện tuần:** mỗi tuần một Huyền thoại "ghé quán" (hiện chỉ có Hermes). Tỷ lệ 0,01% ra Huyền thoại đang ghé.
+- **Bảo hiểm (chỉ khi quay tỷ lệ giờ thường):** chắc chắn có Sử thi ở lượt thứ 100. Bộ đếm về 0 khi ra Sử thi hoặc Huyền thoại, giữ qua các ngày. Hiện số lượt còn lại trên màn hình quán.
+- **Huyền thoại:** khi ra Huyền thoại, chia đều cho Hermes (Ánh sáng) và Morgan le Fay (Bóng tối).
 - Kết quả quay **phải do máy chủ quyết định** (có tiền thật).
 
 ### 3.9 Ban đêm: quái và cổng
@@ -266,9 +272,10 @@ Kim cương miễn phí chỉ từ: ghép 5 ban ngày (3.3) và video. Kim cươ
 | Đang chuỗi rơi thì hết giờ ban ngày | Chờ chuỗi rơi xong rồi mới sang hoàng hôn |
 | Đang chuỗi rơi thì cổng về 0 | Chuỗi rơi tính xong (có thể giết quái) rồi mới kiểm tra cổng |
 | Không còn quái mà chưa hết 45 giây | Quái vẫn sinh tiếp tới giây 45; đêm kết thúc khi hết 45 giây và sân trống |
-| Ghép màu không có pháp sư | Bàn vẫn nổ, không ra đòn, hiện chữ nhỏ "chưa có" trên bệ |
+| Ghép màu không pháp sư nào trên cổng mang | Bàn vẫn nổ, không có đòn thường màu đó; Bóng tối vẫn tính ô |
 | Phép cấp 2 thiếu 1 pháp sư | Bàn nổ theo hình dạng, không ra phép, báo "Cần đủ 2 pháp sư" |
-| Huyền thoại ở bệ màu X, người chơi ghép màu X | Chỉ Huyền thoại đánh (không có đòn riêng màu X) |
+| Nhiều pháp sư cùng mang màu X | Hết lượt mỗi người đánh 1 đòn riêng; ô đặc biệt màu X dùng sức người mạnh nhất |
+| Lượt dây chuyền kéo dài hơn 1 giây | Bóng tối đánh nhiều lần trong lượt; các pháp sư khác chỉ đánh khi lượt kết thúc |
 | Hai 🌈 khác màu đổi nhau | Luôn là Bàn tay thần |
 | Đã có 5 ô 💎 trên bàn mà lại ghép 5 ban ngày | Không sinh thêm 💎, hàng 5 nổ như ghép thường |
 | Ô 💎 ban đêm | Nằm yên, không lật, không bị nổ; vẫn chạm được để nhận 💎 |
@@ -328,8 +335,9 @@ Máy chủ: thời gian ngoại tuyến, quay thẻ, IAP, giới hạn video, l�
 | | Ngũ lôi | 5 tia | |
 | | Hệ số phép cấp 2 | 2 × (1 / 1,25 / 1,5 / 1,75 / 2) | |
 | Kiếm tiền | Quay | 1 💎/lượt | |
-| | Tỷ lệ giờ thường | 88,9 / 10 / 1 / 0,1 | công bố |
-| | Tỷ lệ khung đặc biệt | 94,89 / 5 / 0,1 / 0,01, +1 điểm | đổi 20 / 1.000 / 10.000 |
+| | Tỷ lệ giờ thường | 89,45 / 10 / 0,5 / 0,05 | công bố |
+| | Tỷ lệ giờ vàng (tự chọn tham gia) | 94,89 / 5 / 0,1 / 0,01, +1 điểm | đổi 20 / 1.000 / 10.000 |
+| Chiến đấu | Nhịp Bóng tối | 1 giây | 0,5–2 |
 | | Thưởng mở phép | 20 💎 | |
 | | Bảo hiểm Sử thi | lượt 100 | |
 | | Video | +32 💎, 10/ngày | |
@@ -349,7 +357,7 @@ Máy chủ: thời gian ngoại tuyến, quay thẻ, IAP, giới hạn video, l�
 9. Mô phỏng 1.000.000 lượt quay: tỷ lệ sai lệch < 0,1 điểm % so với công bố; không có chuỗi nào quá 100 lượt không ra Sử thi.
 10. Lên tiềm năng P trừ đúng 32P thẻ và 50P KN; không đủ một trong hai thì nút tắt.
 11. Nâng phẩm chất chỉ khi tiềm năng 5, chỉ 1 lần; sức sau khi nâng bằng pháp sư gốc cùng phẩm chất, cùng cấp, cùng tiềm năng.
-12. Huyền thoại đặt được ở mọi bệ; khi ở bệ màu X, ghép màu X không gọi đòn riêng màu X.
+12. Pháp sư nào cũng đặt được ở mọi bệ. Hết mỗi lượt, mỗi pháp sư (trừ Bóng tối) có nguyên tố vừa ăn đánh đúng 1 đòn bằng tổng ô của mình × sức. Bóng tối đánh mỗi 1 giây bằng tổng ô ăn trong giây đó × sức.
 13. Đủ 30 phép cấp 2 và 17 phép cấp 1 mở được trang sách khi dùng lần đầu.
 
 **Cảm giác (chơi thử với 10–20 người, P0)**
@@ -364,7 +372,7 @@ Máy chủ: thời gian ngoại tuyến, quay thẻ, IAP, giới hạn video, l�
 | Có trong P0 | Để sau |
 |---|---|
 | Bàn 7 × 7, ngày/đêm, 4 công trình + quán rượu, dân, tự sản xuất (ngoại tuyến giả lập) | Máy chủ thật, IAP thật, thẻ tháng thật |
-| 13 pháp sư (có thể bắt đầu với 8: Thường + Anh hùng) | Đủ 29 pháp sư, Tinh anh |
+| 11 pháp sư (4 Thường, 3 Anh hùng, 2 Sử thi, 2 Huyền thoại) | Thêm pháp sư ở bản cập nhật |
 | Quả cầu, Chữ thập, Cầu vồng, Bàn tay thần | Phép thần, thanh Lòng tin (concept mục 5, chưa chốt) |
 | 6 phép cấp 2 hình "Vùng" trước, sau đó đủ 30 | Thời đại, kỳ quan, sự kiện tuần |
 | Quay thẻ chạy trên máy, video giả lập | Bang hội, bảng xếp hạng |
@@ -375,8 +383,9 @@ Máy chủ: thời gian ngoại tuyến, quay thẻ, IAP, giới hạn video, l�
 
 ## 10. Câu hỏi còn mở
 1. ~~Giới hạn ô 💎~~ Đã xử lý 2026-10-24 bằng cách nâng giá (hồi cổng 40 💎, video 32 💎, thẻ tiềm năng ×8), không giới hạn.
-2. ~~Đổi điểm quay thẻ~~ Đã chốt: khung đặc biệt 2 tiếng, đổi 20 / 1.000 / 10.000 (mục 3.8).
+2. ~~Đổi điểm quay thẻ~~ Đã chốt: giờ vàng 2 tiếng (tự chọn tham gia), đổi 20 / 1.000 / 10.000 (mục 3.8).
 3. ~~Thưởng sách phép~~ Đã chốt: 20 💎 mỗi phép mở lần đầu (mục 3.11).
 4. Thời đại, kỳ quan, phép thần (Lòng tin) có vào bản phát hành đầu không?
 5. Engine (Unity hay Godot) và cách làm máy chủ: CTO đề xuất.
 6. ~~Phong cách hình ảnh~~ Đã chốt hướng B "Folk Tale Comic" (mục 2b).
+7. Nâng phẩm chất (tiềm năng 5) có thêm nguyên tố không? Ví dụ Salamander (1 nguyên tố) lên Anh hùng thì có thêm 1 nguyên tố để bằng Anh hùng gốc (2 nguyên tố), hay giữ 1 nguyên tố và chỉ tăng hệ số?

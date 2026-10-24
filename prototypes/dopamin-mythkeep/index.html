@@ -97,7 +97,7 @@ body.night .res{display:none}
 <div id="panel" class="overlay"><div class="card" id="panelCard">
   <h2>Mythkeep: Match &amp; Defend</h2>
   <p><b>Ban ngày:</b> vuốt đổi ô để ghép 3. Mỗi ô cho đúng số +N ghi trên ô. Chạm công trình để nâng cấp và thuê dân (mỗi dân +1 cho ô mới rơi). Chạm pháp sư ở cổng để nâng cấp hoặc đổi người. Quán rượu: 1 💎 một lượt quay thẻ.</p>
-  <p><b>Ban đêm:</b> ghép ra nguyên tố, pháp sư cùng màu bắn quái. Ghép 4 = Quả cầu, ghép L/T = Chữ thập (cột từ trời, chí mạng 150%), ghép 5 = 🌈. Chạm 🌈 để ăn hết ô cùng màu với nó. Đổi 2 ô đặc biệt <b>khác màu</b> (cả 🌈, mang màu của lần ghép 5 tạo ra nó) = phép cấp 2. Khắc: 💧→🔥→🌪️→🪨→💧.</p>
+  <p><b>Ban đêm:</b> ghép ra nguyên tố. Hết mỗi lượt, pháp sư nào có nguyên tố vừa ăn sẽ bắn quái một lần (Bóng tối 🌑 bắn mỗi giây). Ghép 4 = Quả cầu, ghép L/T = Chữ thập (cột từ trời, chí mạng 150%), ghép 5 = 🌈. Chạm 🌈 để ăn hết ô cùng màu với nó. Đổi 2 ô đặc biệt <b>khác màu</b> (cả 🌈, mang màu của lần ghép 5 tạo ra nó) = phép cấp 2. Khắc: 💧→🔥→🌪️→🪨→💧.</p>
   <p>Bản thử tặng sẵn 80 💎 để thử quán rượu.</p>
   <label class="row" style="justify-content:center"><input type="checkbox" id="slow"> Chế độ chậm (quái đi 7 giây)</label>
   <button id="btnStart" type="button">Bắt đầu</button>
@@ -112,14 +112,19 @@ const BEATS={2:0,0:1,1:3,3:2}; // Nước>Lửa>Khí>Đất>Nước
 const mult=(c,e)=>BEATS[c]===e?2:(BEATS[e]===c?.5:1);
 const counterOf=e=>+Object.keys(BEATS).find(k=>BEATS[k]===e);
 const RAR=[{n:'Thường',m:1,col:'#9aa0a6'},{n:'Tinh anh',m:1.25,col:'#4aa3ff'},{n:'Anh hùng',m:1.6,col:'#b36bff'},{n:'Anh hùng sử thi',m:2,col:'#ff7a45'},{n:'Huyền thoại',m:2.5,col:'#ffd23f'}];
-// Bản đầu 13 pháp sư: mỗi nguyên tố 1 Thường, 1 Anh hùng, 1 Anh hùng sử thi; thêm 1 Huyền thoại mang cả 4 nguyên tố.
-// Tên theo thần thoại Hy Lạp, Bắc Âu, Châu Âu và thổ dân Mỹ, xếp phẩm chất theo sức mạnh trong truyện.
-const WNAMES=[['Salamander','Prometheus','Surtr'],['Sylph','Raven','Zeus'],['Undine','Ægir','Poseidon'],['Gnome','Merlin','Gaia']];
-const RTIER=[0,2,3];
-const WIZ=[];WNAMES.forEach((row,el)=>row.forEach((name,i)=>WIZ.push({id:el*3+i,el,r:RTIER[i],name})));
-const LEGEND=12;WIZ.push({id:LEGEND,el:4,r:4,name:'Hermes Trismegistus'});
-COL.push('#ffd23f');NIGHT.push('✨');ELN.push('Tứ nguyên');
-const SLOTX=[.1,.3,.7,.9]; // 4 bệ; Huyền thoại có thể đứng thay pháp sư ở bất kỳ bệ nào
+// Bản đầu 11 pháp sư (chốt 2026-10-24): 4 Thường (1 nguyên tố), 3 Anh hùng (2 nguyên tố), 2 Sử thi (3 nguyên tố),
+// 2 Huyền thoại: Ánh sáng (cả 4 nguyên tố) và Bóng tối (không nguyên tố, đánh mỗi 1 giây theo tổng nguyên tố ăn trong giây đó).
+// Mỗi nguyên tố xuất hiện ở đúng 4 pháp sư (kể cả Ánh sáng là 5).
+const WIZ=[
+ {id:0,els:[0],r:0,name:'Salamander'},{id:1,els:[1],r:0,name:'Sylph'},{id:2,els:[2],r:0,name:'Undine'},{id:3,els:[3],r:0,name:'Gnome'},
+ {id:4,els:[0,3],r:2,name:'Prometheus'},{id:5,els:[2,1],r:2,name:'Ægir'},{id:6,els:[1,3],r:2,name:'Merlin'},
+ {id:7,els:[1,0,2],r:3,name:'Zeus'},{id:8,els:[3,2,0],r:3,name:'Gaia'},
+ {id:9,els:[0,1,2,3],r:4,name:'Hermes Trismegistus',light:true},{id:10,els:[],r:4,name:'Morgan le Fay',dark:true}];
+WIZ.forEach(w=>w.el=w.dark?5:w.light?4:w.els[0]);
+const LEGENDS=[9,10];
+COL.push('#ffd23f','#6a3fa0');NIGHT.push('✨','🌑');ELN.push('Ánh sáng','Bóng tối');
+const elIcons=w=>w.dark?'🌑':w.els.map(e=>NIGHT[e]).join('');
+const SLOTX=[.1,.3,.7,.9]; // 4 bệ, pháp sư nào cũng đứng được ở bệ nào
 const PAIR={'0-1':['Bão lửa','cháy 3 giây (10%/giây)'],'0-3':['Dung nham','cháy mạnh 3 giây (15%/giây)'],'0-2':['Hơi nước','mù, đứng yên 1 giây'],
   '1-3':['Bão cát','đẩy lùi 20% màn hình'],'1-2':['Bão tuyết','đóng băng 2 giây'],'2-3':['Lũ bùn','chậm 50% trong 4 giây']};
 // Hình dạng phép cấp 2: sức mạnh Quả cầu < Chữ thập < Cầu vồng
@@ -131,10 +136,10 @@ const SHAPE={oo:['Vùng','Quả cầu với Quả cầu','nổ 5×5 trên bàn; 
 const pairKey=(a,b)=>a<b?`${a}-${b}`:`${b}-${a}`;
 
 const S={phase:'day',night:1,t:0,res:[0,0,0,18],gems:80,stars:0,spOn:false,bld:[0,0,0,0],workers:[0,0,0,0],
-  cards:Array(13).fill(0),owned:{},gateW:[0,3,6,9],exp:0,pity:0,book:{},power:1,gateStart:10,
+  cards:Array(11).fill(0),owned:{},gateW:[0,1,2,3],turn:[0,0,0,0],darkBuf:0,darkT:0,goldJoin:false,exp:0,pity:0,book:{},power:1,gateStart:10,
   gate:10,gateMax:10,hungry:false,mons:[],fx:[],pops:[],nextSpawn:0,busy:false,slow:false,trans:null,paused:true,shake:0,
   bossEl:Math.floor(Math.random()*4),bossOut:false};
-[0,3,6,9].forEach(id=>S.owned[id]={lv:1,pot:0});
+[0,1,2,3].forEach(id=>S.owned[id]={lv:1,pot:0});
 const $=id=>document.getElementById(id);
 const boardEl=$('board'), canvas=$('scene'), ctx=canvas.getContext('2d');
 let grid=[], uid=0, cell=48, dpr=1; const tileEls=new Map();
@@ -225,6 +230,9 @@ function hasMoves(){for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)for(const [dr,
 function gateWiz(c){const id=S.gateW[c];if(id==null||!S.owned[id])return null;return {...WIZ[id],...S.owned[id]}}
 function power(c){const w=gateWiz(c);if(!w)return 0;return w.lv*RAR[w.r].m*(1+.2*w.pot)*(S.hungry?.75:1)}
 const lvCap=w=>5+5*w.pot;
+// Bệ có pháp sư mạnh nhất điều khiển nguyên tố e (dùng cho ô đặc biệt và phép cấp 2)
+function elemSlot(e){let best=-1,bp=0;for(let i=0;i<4;i++){const w=gateWiz(i);if(w&&w.els.includes(e)&&power(i)>bp){bp=power(i);best=i}}return best}
+const elemPower=e=>{const i=elemSlot(e);return i<0?0:power(i)};
 
 /* ---------- spell book ---------- */
 const BOOK=[];
@@ -250,21 +258,31 @@ function apply(counts,events,casc){
     hud();return;
   }
   const tot=counts.reduce((a,b)=>a+b,0);
-  const li=S.gateW.indexOf(LEGEND);if(tot&&li>=0)legendAttack(tot,li);
+  S.darkBuf+=tot;counts.forEach((n,c)=>S.turn[c]+=n); // đòn thường tính gộp cả lượt, đánh khi lượt kết thúc (endTurn)
   const l2=events.find(e=>e.sp==='L2');
   if(l2){cast2(l2.a,l2.b,l2.shape,tot);return}
   counts.forEach((n,c)=>{if(!n)return;const ev=events.filter(e=>e.c===c).map(e=>e.sp);
     const mode=ev.includes('zap')?'zap':ev.includes('cross')?'cross':ev.includes('orb')?'orb':'bolt';
-    if(S.gateW[c]!==LEGEND)attack(c,n,mode)});
+    if(mode!=='bolt')attack(c,n,mode)});
 }
-function legendAttack(n,li){const pw=power(li);if(!pw)return;const list=alive();if(!list.length)return;const t0=list[0];const [wx,wy]=wizPos(li),[tx,ty]=monPos(t0);
-  hit(t0,n*pw*2,4);S.fx.push({k:'bolt',x0:wx,y0:wy,x1:tx,y1:ty,c:4,t:0})} // Huyền thoại khắc mọi nguyên tố: luôn ×2
+// Một lượt = một lần đổi và mọi lần ăn dây chuyền cho tới khi chờ lần đổi tiếp. Hết lượt, mỗi pháp sư (trừ Bóng tối)
+// đánh 1 lần nếu lượt đó có ăn nguyên tố của mình: sát thương = tổng ô thuộc các nguyên tố của mình × sức × khắc chế tốt nhất.
+function endTurn(){const t=S.turn;S.turn=[0,0,0,0];if(S.phase!=='night'||!t.some(x=>x))return;
+  for(let i=0;i<4;i++){const w=gateWiz(i);if(!w||w.dark)continue;const ate=w.els.filter(e=>t[e]);if(!ate.length)continue;
+    const list=alive();if(!list.length)return;const m=list[0];const n=ate.reduce((a,e)=>a+t[e],0);
+    let ce=ate[0];for(const e of ate)if(mult(e,m.el)>mult(ce,m.el))ce=e;
+    const [wx,wy]=wizPos(i),[tx,ty]=monPos(m);const d=hit(m,n*power(i)*mult(ce,m.el),ce);
+    S.fx.push({k:'bolt',x0:wx,y0:wy,x1:tx,y1:ty,c:w.light?4:ce,t:0});ate.forEach(e=>unlock(`bolt-${e}`,d))}}
+// Bóng tối: mỗi 1 giây đánh 1 lần, sát thương = tổng nguyên tố ăn được trong giây đó × sức (không khắc chế)
+function darkTick(){const n=S.darkBuf;S.darkBuf=0;const i=S.gateW.findIndex(id=>id!=null&&WIZ[id].dark&&S.owned[id]);if(i<0||!n)return;
+  const list=alive();if(!list.length)return;const m=list[0];const [wx,wy]=wizPos(i),[tx,ty]=monPos(m);
+  hit(m,n*power(i),5);S.fx.push({k:'bolt',x0:wx,y0:wy,x1:tx,y1:ty,c:5,t:0})}
 function wizPos(i){const W=canvas.width/dpr,H=canvas.height/dpr;return [W*SLOTX[i],H-30]}
 function monPos(m){const W=canvas.width/dpr,H=canvas.height/dpr;return [m.x*W,10+m.y*(H-62)]}
 const alive=()=>S.mons.filter(m=>m.hp>0).sort((a,b)=>b.y-a.y);
 function attack(c,n,mode){
-  const [wx,wy]=wizPos(c);const pw=power(c);
-  if(!pw){S.pops.push({x:wx,y:wy-30,text:'chưa có',col:'#aaa',t:0});return}
+  const sl=elemSlot(c);if(sl<0){banner(`Chưa có pháp sư ${NIGHT[c]} ở cổng`);return}
+  const [wx,wy]=wizPos(sl);const pw=power(sl);
   const list=alive();if(!list.length)return;
   const base=n*pw;const t0=list[0];const [tx,ty]=monPos(t0);let total=0;
   if(mode==='bolt'){total+=hit(t0,base*mult(c,t0.el),c);S.fx.push({k:'bolt',x0:wx,y0:wy,x1:tx,y1:ty,c,t:0});unlock(`bolt-${c}`,total)}
@@ -275,7 +293,7 @@ function attack(c,n,mode){
     unlock(`zap-${c}`,total)}
 }
 function cast2(a,b,shape,n){
-  const pk=pairKey(a,b);const pa=power(a),pb=power(b);
+  const pk=pairKey(a,b);const pa=elemPower(a),pb=elemPower(b);
   if(!pa||!pb){banner('Cần đủ 2 pháp sư cho phép cấp 2');return}
   const list=alive();if(!list.length){unlock(`L2-${pk}-${shape}`,0);return}
   const base=n*(pa+pb)/2*2*SHAPE[shape][3];const best=m=>Math.max(mult(a,m.el),mult(b,m.el));let total=0;const hitList=new Set();
@@ -313,7 +331,7 @@ async function trySwap(r1,c1,r2,c2){
     if(isSp(a)&&isSp(b)){await combo(r1,c1,r2,c2,b,a);return}
     if(findRuns().runs.length)await resolve([key(r1,c1),key(r2,c2)]);
     else{grid[r1][c1]=a;grid[r2][c2]=b;render();await wait(180)}
-  }finally{S.busy=false}
+  }finally{endTurn();S.busy=false}
 }
 async function blast(clear,events){
   expand(clear,events);const counts=tally(clear);apply(counts,events,1);removeCells(clear);await settle();await resolve();
@@ -350,10 +368,10 @@ async function combo(r1,c1,r2,c2,A,B){ // A ở (r1,c1), B ở (r2,c2)
 function tapCell(r,c){
   const t=grid[r]?.[c];if(!t||S.busy||S.paused||S.trans)return;
   if(t.sp==='gem'){S.gems+=1;bump('rg');hud();grid[r][c]=null;S.busy=true;
-    (async()=>{await settle();await resolve();S.busy=false})()}
+    (async()=>{await settle();await resolve();endTurn();S.busy=false})()}
   if(t.sp==='rainbow'){ // chạm cầu vồng: ăn hết ô cùng màu với nó
     const clear=new Set();grid.forEach((row,rr)=>row.forEach((u,cc)=>{if(matchable(u)&&u.c===t.c)clear.add(key(rr,cc))}));
-    grid[r][c]=null;S.busy=true;(async()=>{await blast(clear,[{sp:'zap',c:t.c}]);S.busy=false})()}
+    grid[r][c]=null;S.busy=true;(async()=>{await blast(clear,[{sp:'zap',c:t.c}]);endTurn();S.busy=false})()}
 }
 
 /* ---------- input ---------- */
@@ -385,48 +403,51 @@ function openBuilding(i){S.openB=i;
   $('bUp').onclick=()=>{if(S.res[1]>=up[0]&&S.res[3]>=up[1]){S.res[1]-=up[0];S.res[3]-=up[1];S.bld[i]++;refresh(()=>openBuilding(i))}else banner('Thiếu tài nguyên')};
   $('bHire').onclick=()=>{if(k<L&&S.res[3]>=hire){S.res[3]-=hire;S.workers[i]++;refresh(()=>openBuilding(i))}else banner('Thiếu vàng')};
 }
-const featured=()=>WIZ[LEGEND];
-// Tỷ lệ công bố (chốt 2026-10-24). Giờ thường: Anh hùng 10%, Sử thi 1% (chắc chắn ở lượt 100), Huyền thoại 0,1%.
-// Khung đặc biệt 2 tiếng/ngày (bản thử: 20h–22h giờ máy, hoặc bật nút giả lập): 5% / 0,1% / 0,01%, mỗi lượt +1 điểm Sao.
-const inSpecial=()=>{const h=new Date().getHours();return S.spOn||(h>=20&&h<22)};
+const featured=()=>WIZ[LEGENDS[rnd(2)]];
+// Tỷ lệ công bố (chốt 2026-10-24 04:53). Giờ thường: Anh hùng 10%, Sử thi 0,5% (chắc chắn ở lượt 100), Huyền thoại 0,05%.
+// Giờ vàng 2 tiếng/ngày (bản thử: 20h–22h giờ máy, hoặc bật giả lập). Người chơi tự chọn tham gia; đã tham gia thì
+// 5% / 0,1% / 0,01% và mỗi lượt +1 điểm Sao, không tham gia thì vẫn tỷ lệ giờ thường.
+const inWindow=()=>{const h=new Date().getHours();return S.spOn||(h>=20&&h<22)};
+const inSpecial=()=>inWindow()&&S.goldJoin;
 function rollRarity(){let x=Math.random()*100;
   if(inSpecial()){S.stars++;if(x<.01)return 4;if(x<.11)return 3;if(x<5.11)return 2;return 0}
-  S.pity++;if(x<.1){S.pity=0;return 4}if(x<1.1||S.pity>=100){S.pity=0;return 3}if(x<11.1)return 2;return 0}
+  S.pity++;if(x<.05){S.pity=0;return 4}if(x<.55||S.pity>=100){S.pity=0;return 3}if(x<10.55)return 2;return 0}
 const XCH=[[2,20],[3,1000],[4,10000]];
 function exchange(r){const cost=XCH.find(x=>x[0]===r)[1];if(S.stars<cost){banner(`Cần ${cost} điểm Sao`);return []}
-  S.stars-=cost;const pool=r===4?[featured()]:WIZ.filter(w=>w.r===r&&w.el<4);const w=pool[rnd(pool.length)];S.cards[w.id]++;return [w]}
+  S.stars-=cost;const pool=WIZ.filter(w=>w.r===r);const w=pool[rnd(pool.length)];S.cards[w.id]++;return [w]}
 function pull(n){if(S.gems<n){banner(`Cần ${n} 💎`);return []}S.gems-=n;const got=[];
-  for(let i=0;i<n;i++){let r=rollRarity();const pool=r===4?[featured()]:WIZ.filter(w=>w.r===r&&w.el<4);const w=pool[rnd(pool.length)];S.cards[w.id]++;got.push(w)}
+  for(let i=0;i<n;i++){let r=rollRarity();const pool=WIZ.filter(w=>w.r===r);const w=pool[rnd(pool.length)];S.cards[w.id]++;got.push(w)}
   return got}
 function openTavern(last=[]){
-  const f=featured(),wk=Math.floor((S.night-1)/7);
-  openPanel(`<h2>Quán rượu</h2><p><b>Sự kiện tuần (đêm ${wk*7+1}–${wk*7+7}):</b> ✨ <b style="color:${RAR[4].col}">${f.name}</b> ghé quán. Mang cả 4 nguyên tố, khắc mọi nguyên tố, đánh mỗi khi ăn bất kỳ ô nào. Đứng được ở bất kỳ bệ nào trong 4 bệ.</p>
+  openPanel(`<h2>Quán rượu</h2><p><b>Huyền thoại:</b> ✨ <b style="color:${RAR[4].col}">Hermes</b> (Ánh sáng, cả 4 nguyên tố) và 🌑 <b style="color:${RAR[4].col}">Morgan le Fay</b> (Bóng tối, đánh mỗi giây theo tổng nguyên tố vừa ăn).</p>
    <p>1 💎 một lượt, ra 1 thẻ pháp sư. Đang có ${S.gems} 💎, ${S.stars} điểm Sao.</p>
-   <p>${inSpecial()?`<b>⭐ Đang trong khung đặc biệt.</b> Tỷ lệ: Anh hùng 5%, Sử thi 0,1%, Huyền thoại 0,01%. Mỗi lượt +1 điểm Sao.`:`<b>Giờ thường.</b> Tỷ lệ: Anh hùng 10%, Sử thi 1%, Huyền thoại 0,1%. Chắc chắn có Sử thi ở lượt thứ 100 (còn ${100-S.pity} lượt). Khung đặc biệt: 20h–22h.`}</p>
+   <p>${inSpecial()?`<b>⭐ Đang tham gia giờ vàng.</b> Tỷ lệ: Anh hùng 5%, Sử thi 0,1%, Huyền thoại 0,01%. Mỗi lượt +1 điểm Sao.`:`<b>Tỷ lệ giờ thường:</b> Anh hùng 10%, Sử thi 0,5%, Huyền thoại 0,05%. Chắc chắn có Sử thi ở lượt thứ 100 (còn ${100-S.pity} lượt).${inWindow()?'':' Giờ vàng: 20h–22h.'}`}</p>
+   ${inWindow()?`<div class="row"><button id="gold" type="button">${S.goldJoin?'Rời giờ vàng (về tỷ lệ thường)':'⭐ Tham gia giờ vàng'}</button></div>`:''}
    <div class="row"><button id="t1" type="button">Quay 1 (1💎)</button><button id="t10" type="button">Quay 10 (10💎)</button></div>
    <div class="row"><button id="x2" type="button" ${S.stars<20?'disabled':''}>Đổi Anh hùng (20⭐)</button><button id="x3" type="button" ${S.stars<1000?'disabled':''}>Đổi Sử thi (1.000⭐)</button><button id="x4" type="button" ${S.stars<10000?'disabled':''}>Đổi Huyền thoại (10.000⭐)</button></div>
-   <div class="row"><button id="spT" type="button">${S.spOn?'Tắt':'Bật'} giả lập khung đặc biệt</button></div>
-   ${last.length?`<div class="cards">${last.map(w=>`<span class="cardmini" style="--r:${RAR[w.r].col};border-color:${RAR[w.r].col}">${NIGHT[w.el]} ${w.name}<br><small>${RAR[w.r].n}</small></span>`).join('')}</div><p>Thẻ đã vào túi. Chạm pháp sư ở cổng để triệu hồi hoặc tăng tiềm năng.</p>`:''}`,true);
+   <div class="row"><button id="spT" type="button">${S.spOn?'Tắt':'Bật'} giả lập giờ vàng</button></div>
+   ${last.length?`<div class="cards">${last.map(w=>`<span class="cardmini" style="--r:${RAR[w.r].col};border-color:${RAR[w.r].col}">${elIcons(w)} ${w.name}<br><small>${RAR[w.r].n}</small></span>`).join('')}</div><p>Thẻ đã vào túi. Chạm pháp sư ở cổng để triệu hồi hoặc tăng tiềm năng.</p>`:''}`,true);
   $('t1').onclick=()=>{const g=pull(1);hud();refresh(()=>openTavern(g))};
   $('t10').onclick=()=>{const g=pull(10);hud();refresh(()=>openTavern(g))};
   [2,3,4].forEach(r=>$('x'+r).onclick=()=>{const g=exchange(r);refresh(()=>openTavern(g))});
   $('spT').onclick=()=>{S.spOn=!S.spOn;refresh(()=>openTavern())};
+  if($('gold'))$('gold').onclick=()=>{S.goldJoin=!S.goldJoin;refresh(()=>openTavern())};
 }
 function openRoster(el){
-  const rows=WIZ.filter(w=>w.el===el||(w.id===LEGEND&&(S.owned[w.id]||S.cards[w.id]))).map(w=>{const o=S.owned[w.id],cards=S.cards[w.id],wr=o&&o.r!=null?o.r:w.r,rc=RAR[wr].col;
-    if(!o)return `<div class="wz" style="--r:${rc}"><div><b>${w.name}</b> <small>${RAR[w.r].n} · chưa có · thẻ ${cards}</small></div>
+  const rows=WIZ.map(w=>{const o=S.owned[w.id],cards=S.cards[w.id],wr=o&&o.r!=null?o.r:w.r,rc=RAR[wr].col;
+    if(!o)return `<div class="wz" style="--r:${rc}"><div><b>${elIcons(w)} ${w.name}</b> <small>${RAR[w.r].n} · chưa có · thẻ ${cards}</small></div>
       <div class="row"><button type="button" data-a="sum" data-id="${w.id}" ${cards<1?'disabled':''}>Triệu hồi (1 thẻ)</button></div></div>`;
     const cap=lvCap(o),costLv=8*o.lv,needPot=32*(o.pot+1),needExp=50*(o.pot+1),atGate=S.gateW[el]===w.id;
-    return `<div class="wz" style="--r:${rc}"><div><b>${w.name}</b> <small>${o.asc?'⭐ ':''}${RAR[wr].n} ×${RAR[wr].m} · cấp ${o.lv}/${cap} · tiềm năng ${o.pot}/5 · thẻ ${cards}${atGate?' · <b>đang ở cổng</b>':''}</small></div>
+    return `<div class="wz" style="--r:${rc}"><div><b>${elIcons(w)} ${w.name}</b> <small>${o.asc?'⭐ ':''}${RAR[wr].n} ×${RAR[wr].m} · cấp ${o.lv}/${cap} · tiềm năng ${o.pot}/5 · thẻ ${cards}${atGate?' · <b>đang ở cổng</b>':''}</small></div>
       <div class="row"><button type="button" data-a="lv" data-id="${w.id}" ${o.lv>=cap?'disabled':''}>Lên cấp (${costLv}💠)</button>
       <button type="button" data-a="pot" data-id="${w.id}" ${o.pot>=5||cards<needPot||S.exp<needExp?'disabled':''}>Tiềm năng (${needPot} thẻ + ${needExp} KN)</button>
       ${o.pot>=5&&!o.asc&&wr<4?`<button type="button" data-a="asc" data-id="${w.id}">⭐ Nâng lên ${RAR[wr+1].n}</button>`:''}
       ${atGate?'':`<button type="button" data-a="gate" data-id="${w.id}">Ra cổng</button>`}</div></div>`}).join('');
-  openPanel(`<h2>Bệ ${ELN[el]} ${NIGHT[el]}</h2><p>${S.owned[LEGEND]||S.cards[LEGEND]?'Huyền thoại ✨ có thể đứng ở bệ này thay pháp sư hệ này: đánh mỗi khi ăn bất kỳ ô nào, luôn khắc chế (×2); ô hệ này không còn pháp sư riêng. ':''}Sức = cấp × phẩm chất × (1 + 0,2 × tiềm năng). Cấp tối đa = 5 + 5 × tiềm năng. Tiềm năng đủ 5 thì được nâng phẩm chất 1 lần (⭐), giữ nguyên cấp và tiềm năng, nên mạnh đúng bằng pháp sư gốc phẩm chất đó.</p>${rows}`);
+  openPanel(`<h2>Bệ ${el+1}</h2><p>Pháp sư nào cũng đứng được ở bệ nào. Hết mỗi lượt (một lần đổi và các lần ăn dây chuyền), pháp sư đánh 1 lần nếu lượt đó có ăn nguyên tố của mình. Bóng tối 🌑 đánh mỗi 1 giây theo tổng nguyên tố ăn được trong giây đó. Sức = cấp × phẩm chất × (1 + 0,2 × tiềm năng). Cấp tối đa = 5 + 5 × tiềm năng. Tiềm năng đủ 5 thì được nâng phẩm chất 1 lần (⭐), giữ nguyên cấp và tiềm năng, nên mạnh đúng bằng pháp sư gốc phẩm chất đó.</p>${rows}`);
   $('panelCard').querySelectorAll('button[data-a]').forEach(btn=>btn.onclick=()=>{const id=+btn.dataset.id,a=btn.dataset.a,o=S.owned[id];
     if(a==='sum'){S.cards[id]--;S.owned[id]={lv:1,pot:0};banner(`Triệu hồi ${WIZ[id].name}`)}
     if(a==='lv'){if(S.res[2]>=8*o.lv){S.res[2]-=8*o.lv;o.lv++}else banner('Thiếu mana')}
-    if(a==='pot'){S.cards[id]-=4*(o.pot+1);S.exp-=50*(o.pot+1);o.pot++}
+    if(a==='pot'){S.cards[id]-=32*(o.pot+1);S.exp-=50*(o.pot+1);o.pot++}
     if(a==='asc'){o.r=WIZ[id].r+1;o.asc=true;banner(`⭐ ${WIZ[id].name} lên ${RAR[o.r].n}`)}
     if(a==='gate'){const prev=S.gateW.indexOf(id);if(prev>=0)S.gateW[prev]=null;S.gateW[el]=id}
     hud();refresh(()=>openRoster(el))});
@@ -468,7 +489,7 @@ function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
   if(!S.paused){
     if(S.trans){S.trans.p+=dt/.7;if(S.trans.p>=1)S.trans=null}
     else if(S.phase==='day'){S.t+=dt;if(S.t>=DAY_LEN&&!S.busy)startNight()}
-    else{S.t+=dt;const travel=S.slow?7:5,scale=S.power;
+    else{S.t+=dt;S.darkT+=dt;if(S.darkT>=1){S.darkT-=1;darkTick()}const travel=S.slow?7:5,scale=S.power;
       if(!S.bossOut&&S.t>=38){S.bossOut=true;const hp=40*scale;S.mons.push({x:.5,y:0,el:S.bossEl,big:true,boss:true,hp,max:hp});banner(`TRÙM ${NIGHT[S.bossEl]}`)}
       while(S.t>=S.nextSpawn&&S.nextSpawn<NIGHT_SPAWN){const big=Math.random()<.2;const hp=(big?15:6)*scale;S.mons.push({x:.12+Math.random()*.76,y:0,el:rnd(4),big,hp,max:hp});S.nextSpawn+=SPAWN_EVERY}
       for(const m of S.mons)if(m.hp>0){
@@ -509,7 +530,7 @@ function drawVillage(W,H,oy){ctx.save();ctx.translate(0,oy);ctx.textAlign='cente
   ctx.fillStyle='#8cbf6a';ctx.fillRect(0,H*.45,W,H);
   ctx.fillStyle='#6b4428';ctx.fillRect(0,12,W,58);ctx.fillStyle='#8a5a35';for(let x=0;x<W;x+=14)ctx.fillRect(x,6,10,64);
   for(let i=0;i<4;i++){const x=W*SLOTX[i],w=drawWizard(x,40,i,20);ctx.font='800 10px Nunito';ctx.fillStyle='#1d1a12';
-    ctx.fillText(w?`${w.name} Lv${w.lv}`:ELN[i],x,79)}
+    ctx.fillText(w?`${w.name} Lv${w.lv}`:`Bệ ${i+1}`,x,79)}
   ctx.font='800 12px Nunito';ctx.fillStyle='#1d1a12';
   ctx.fillText(`Trùm đêm nay: ${NIGHT[S.bossEl]} ${ELN[S.bossEl]} · khắc nó: ${NIGHT[counterOf(S.bossEl)]} ${ELN[counterOf(S.bossEl)]}`,W/2,H*.37);
   for(let i=0;i<5;i++){const x=W*(.1+.2*i),y=H*.6,bw=W*.17;const tav=i===4;
